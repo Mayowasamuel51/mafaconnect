@@ -1,29 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Moon, Sun, Eye, EyeOff } from "lucide-react";
-import mafaLogo from "@/assets/mafa-logo.png";
+import mafaLogo from "../assets/mafa-logo.png";
 
-// ✅ UI components (in src/components/ui)
+// Replace these with your local components or use HTML equivalents
+// import { Button } from "../components/Button";
+// import { Input } from "../components/Input";
+// import { Label } from "../components/Label";
+
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/Card";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/Tabs.jsx";
-
-// ✅ Hooks (in src/hooks)
-import { useTheme } from "@/hooks/useTheme";
-import { useToast } from "@/hooks/useToast";
+// import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/Card";
+import { Card } from "@/components/ui/Card";
+import { CardContent } from "@/components/ui/Card";
+import { CardHeader } from "@/components/ui/Card";
+import { CardTitle } from "@/components/ui/Card";
+import { CardDescription } from "@/components/ui/Card";
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/Tabs";
+import { Tabs,TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
+import { useTheme } from "../hooks/useTheme";
+import { useToast } from "../hooks/useToast";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -33,60 +30,65 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isWaitingForRecovery, setIsWaitingForRecovery] = useState(false);
 
-  // Login
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  // Signup
+  const [signupFullName, setSignupFullName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
-  const [signupFullName, setSignupFullName] = useState("");
+  const [signupPhone, setSignupPhone] = useState("");
+  const [customerType, setCustomerType] = useState("individual");
 
-  // Reset
   const [resetEmail, setResetEmail] = useState("");
 
-  const handleLogin = async (e) => {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Simulated Login
+  const handleLogin = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
       toast({
         title: "Welcome back!",
         description: `Logged in as ${loginEmail}`,
       });
+      setLoading(false);
       navigate("/");
-    }, 1200);
+    }, 1000);
   };
 
-  const handleSignup = async (e) => {
+  // Simulated Signup
+  const handleSignup = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
       toast({
         title: "Account created!",
-        description: `Welcome, ${signupFullName}. You can now log in.`,
+        description: `Welcome ${signupFullName}. You can now log in.`,
       });
-    }, 1200);
+      setLoading(false);
+    }, 1000);
   };
 
-  const handleResetPassword = async (e) => {
+  // Simulated Reset Email
+  const handleResetPassword = (e) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
       toast({
         title: "Reset email sent!",
         description: "Check your inbox for the reset link.",
       });
+      setLoading(false);
       setResetEmail("");
-    }, 1200);
+    }, 1000);
   };
 
-  const handleUpdatePassword = async (e) => {
+  // Simulated Update Password
+  const handleUpdatePassword = (e) => {
     e.preventDefault();
     setLoading(true);
     if (newPassword !== confirmPassword) {
@@ -95,13 +97,15 @@ export default function Auth() {
       return;
     }
     setTimeout(() => {
-      setLoading(false);
       toast({
         title: "Password updated!",
-        description: "Your password was successfully changed.",
+        description: "Your password has been successfully changed.",
       });
       setIsRecoveryMode(false);
-    }, 1200);
+      setNewPassword("");
+      setConfirmPassword("");
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -116,11 +120,11 @@ export default function Auth() {
         {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </Button>
 
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader>
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
           <CardTitle className="flex items-center gap-3 text-3xl font-bold">
             <img src={mafaLogo} alt="MAFA Logo" className="h-12 w-12" />
-            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
               MAFA Connect
             </span>
           </CardTitle>
@@ -128,18 +132,30 @@ export default function Auth() {
         </CardHeader>
 
         <CardContent>
-          {isRecoveryMode ? (
-            // ✅ Recovery Mode
+          {isWaitingForRecovery ? (
+            // Waiting for reset verification
+            <div className="text-center mt-6 space-y-4">
+              <h2 className="text-2xl font-bold">Verifying Reset Link</h2>
+              <p className="text-sm text-gray-500">
+                Please wait while we verify your password reset link...
+              </p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+            </div>
+          ) : isRecoveryMode ? (
+            // Recovery mode
             <form onSubmit={handleUpdatePassword} className="space-y-4 mt-6">
-              <h2 className="text-xl font-semibold text-center mb-2">Set New Password</h2>
-              <Label>New Password</Label>
+              <h2 className="text-xl font-semibold text-center">Set New Password</h2>
+
+              <Label htmlFor="new-password">New Password</Label>
               <div className="relative">
                 <Input
+                  id="new-password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
-                  minLength={6}
+                  className="h-11 pr-10"
                 />
                 <Button
                   type="button"
@@ -148,19 +164,26 @@ export default function Auth() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-0 top-0 h-11 w-10"
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
 
-              <Label>Confirm Password</Label>
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
               <Input
+                id="confirm-password"
                 type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                className="h-11"
               />
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -181,9 +204,9 @@ export default function Auth() {
               </Button>
             </form>
           ) : (
-            // ✅ Normal Tabs
-            <Tabs defaultValue="login">
-              <TabsList className="grid w-full grid-cols-3">
+            // Main tabs (login/signup/reset)
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid grid-cols-3 w-full">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
                 <TabsTrigger value="reset">Reset</TabsTrigger>
@@ -200,7 +223,6 @@ export default function Auth() {
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
                   />
-
                   <Label>Password</Label>
                   <Input
                     type="password"
@@ -209,8 +231,11 @@ export default function Auth() {
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
                   />
-
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+                    disabled={loading}
+                  >
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -223,9 +248,35 @@ export default function Auth() {
                 </form>
               </TabsContent>
 
-              {/* SIGN UP */}
+              {/* SIGNUP */}
               <TabsContent value="signup">
                 <form onSubmit={handleSignup} className="space-y-4">
+                  <Label>Account Type</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      className={`p-3 border rounded-lg text-sm ${
+                        customerType === "individual"
+                          ? "border-purple-500 bg-purple-100"
+                          : "border-gray-300 hover:border-purple-400"
+                      }`}
+                      onClick={() => setCustomerType("individual")}
+                    >
+                      👤 Individual
+                    </button>
+                    <button
+                      type="button"
+                      className={`p-3 border rounded-lg text-sm ${
+                        customerType === "corporate"
+                          ? "border-purple-500 bg-purple-100"
+                          : "border-gray-300 hover:border-purple-400"
+                      }`}
+                      onClick={() => setCustomerType("corporate")}
+                    >
+                      🏢 Corporate
+                    </button>
+                  </div>
+
                   <Label>Full Name</Label>
                   <Input
                     type="text"
@@ -244,6 +295,14 @@ export default function Auth() {
                     required
                   />
 
+                  <Label>Phone (optional)</Label>
+                  <Input
+                    type="tel"
+                    placeholder="+234 800 000 0000"
+                    value={signupPhone}
+                    onChange={(e) => setSignupPhone(e.target.value)}
+                  />
+
                   <Label>Password</Label>
                   <Input
                     type="password"
@@ -254,11 +313,15 @@ export default function Auth() {
                     minLength={6}
                   />
 
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+                    disabled={loading}
+                  >
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating account...
+                        Creating...
                       </>
                     ) : (
                       "Sign Up"
@@ -278,8 +341,14 @@ export default function Auth() {
                     onChange={(e) => setResetEmail(e.target.value)}
                     required
                   />
-
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  <p className="text-sm text-gray-500">
+                    Enter your email address and we'll send you a reset link.
+                  </p>
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+                    disabled={loading}
+                  >
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
