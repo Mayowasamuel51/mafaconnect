@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ export default function Auth() {
 
       if (res.data.accessToken) {
         localStorage.setItem("ACCESS_TOKEN", res.data.accessToken);
+        console.log(res.data.accessToken)
         toast({
           title: "✅ Login Successful",
           description: `Welcome back, ${res.data.admin?.name || "User"}`,

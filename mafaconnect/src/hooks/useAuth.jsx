@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
  * Make sure your .env file has:
  * VITE_HOME_OO="https://your-backend-domain.com/api"
  */
-const API_URL = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
+const API_URL = import.meta.env.VITE_HOME_OO 
 /**
  * Fetch the currently authenticated user
  */
@@ -15,7 +15,7 @@ async function fetchCurrentUser() {
   const token = localStorage.getItem("ACCESS_TOKEN");
   if (!token) throw new Error("No token");
   const res = await fetch(`${API_URL}/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` },credentials: "include",
   });
 
   if (!res.ok) throw new Error("Unauthorized");
@@ -103,6 +103,52 @@ export function useAuth() {
     isError,
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
