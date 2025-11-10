@@ -2,33 +2,34 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/uimain/select";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useLocations } from "@/hooks/useLocations";
 import { TRANSACTION_TYPES, calculateDueDate, getPaymentTermsOptions, formatCurrency } from "@/lib/transactionUtils";
 
+
 const transactionSchema = z.object({
-  transactionType),
+  transactionType: z.string(),
   customerId: z.string().optional(),
   locationId: z.string().optional(),
   paymentMethod: z.string().optional(),
@@ -36,6 +37,12 @@ const transactionSchema = z.object({
   discount: z.number().min(0).default(0),
   notes: z.string().optional(),
 });
+
+
+
+
+
+
 
 export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps) {
   const [selectedType, setSelectedType] = useState("cash_sale");
@@ -59,7 +66,7 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
     reset,
     formState: { errors },
   } = useForm<TransactionFormData>({
-    resolver),
+    resolver: zodResolver(transactionSchema),
     defaultValues: {
       transactionType: "cash_sale",
       discount: 0,
@@ -86,8 +93,8 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
       setSelectedProduct("");
       setQuantity(1);
       reset({
-        transactionType,
-        discount,
+        transactionType: "cash_sale",
+        discount: 0,
         customerId,
         locationId,
         paymentMethod,
@@ -112,10 +119,10 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
       setItems([
         ...items,
         {
-          productId,
-          productName,
+          productId: product.id,
+          productName: product.name,
           quantity,
-          unitPrice,
+          unitPrice: product.sale_price,
         },
       ]);
     }
@@ -132,12 +139,12 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
   const tax = subtotal * 0.075; // 7.5% VAT
   const total = subtotal + tax - discount;
 
-  const onSubmit = (data) => {
-    console.log("🔥 FORM SUBMITTED");
-    console.log("📋 Form data, data);
-    console.log("📦 Items, items);
-    console.log("👤 Selected Customer, selectedCustomer);
-    console.log("📍 Selected Location, selectedLocation);
+  const onSubmit = (data: TransactionFormData) => {
+    console.log("🔥 FORM SUBMITTED!");
+    console.log("📋 Form data:", data);
+    console.log("📦 Items:", items);
+    console.log("👤 Selected Customer:", selectedCustomer);
+    console.log("📍 Selected Location:", selectedLocation);
     
     // Frontend validation
     if (items.length === 0) {
@@ -158,17 +165,17 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
       return;
     }
 
-    const dueDate = data.paymentTerms ? calculateDueDate(data.paymentTerms) : null;
+    const dueDate = data.paymentTerms ? calculateDueDate(data.paymentTerms) ;
 
     createTransaction({
-      transactionType,
-      customerId,
-      locationId,
-      items) => ({
-        productId,
-        description,
-        quantity,
-        unitPrice,
+      transactionType: selectedType,
+      customerId: selectedCustomer,
+      locationId: selectedLocation,
+      items: items.map((item) => ({
+        productId: item.productId,
+        description: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
       })),
       paymentMethod: data.paymentMethod,
       discount: data.discount,
@@ -217,13 +224,13 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit, (errors) => {
-          console.error("❌ FORM VALIDATION FAILED");
-          console.error("🚨 Validation errors, errors);
+          console.error("❌ FORM VALIDATION FAILED!");
+          console.error("🚨 Validation errors:", errors);
           alert("Form validation failed. Check console for details.");
         })} className="space-y-6">
           {Object.keys(errors).length > 0 && (
             <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
-              <p className="text-sm font-medium text-destructive">Please fix the following errors
+              <p className="text-sm font-medium text-destructive">Please fix the following errors:</p>
               <ul className="mt-2 text-sm text-destructive list-disc list-inside">
                 {Object.entries(errors).map(([key, error]) => (
                   <li key={key}>{key}: {error?.message || "Invalid value"}</li>
@@ -265,9 +272,11 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                 <div className="text-sm text-muted-foreground py-2">Loading customers...</div>
               ) : !customers || customers.length === 0 ? (
                 <div className="text-sm text-destructive py-2">No customers found. Please add customers first.</div>
-              ){selectedCustomer}
+              ) : (
+                <Select
+                  value={selectedCustomer}
                   onValueChange={(value) => {
-                    console.log("👤 Customer selected, value);
+                    console.log("👤 Customer selected:", value);
                     setSelectedCustomer(value);
                     setValue("customerId", value);
                   }}
@@ -295,9 +304,11 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                 <div className="text-sm text-muted-foreground py-2">Loading locations...</div>
               ) : !locations || locations.length === 0 ? (
                 <div className="text-sm text-destructive py-2">No locations found. Please add locations first.</div>
-              ){selectedLocation}
+              ) : (
+                <Select
+                  value={selectedLocation}
                   onValueChange={(value) => {
-                    console.log("📍 Location selected, value);
+                    console.log("📍 Location selected:", value);
                     setSelectedLocation(value);
                     setValue("locationId", value);
                   }}
@@ -417,7 +428,7 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
             <Label>Discount</Label>
             <Input
               type="number"
-              {...register("discount", { valueAsNumber)}
+              {...register("discount", { valueAsNumber: true })}
               min={0}
               step={0.01}
             />
@@ -436,11 +447,12 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
               <span>{formatCurrency(subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Tax (7.5%){formatCurrency(tax)}</span>
+              <span>Tax (7.5%):</span>
+              <span>{formatCurrency(tax)}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-destructive">
-                <span>Discount
+                <span>Discount:</span>
                 <span>-{formatCurrency(discount)}</span>
               </div>
             )}

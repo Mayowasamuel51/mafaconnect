@@ -1,36 +1,63 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
 import { Link } from "react-router-dom";
-import { UserManagement } from "@/components/admin/UserManagement";
+// import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
 import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
-import { BulkOperations } from "@/components/admin/BulkOperations";
+
+// import BulkOperations from "@/components/admin/BulkOperations";
+import BulkOperations from "@/components/admin/BulkOperations";
+// import BulkOperations from "/src/components/admin/BulkOperations.jsx";
+import { UserManagement } from "@/components/admin/UserManagement";
 import { KYCManagement } from "@/components/admin/KYCManagement";
-import { Shield, Users, Settings, FileText, Database, Receipt, ArrowRight, Wrench, CheckSquare } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  Shield,
+  Users,
+  Settings,
+  FileText,
+  Database,
+  Receipt,
+  ArrowRight,
+  Wrench,
+  CheckSquare,
+} from "lucide-react";
 import { toast } from "sonner";
+import { apiPost } from "@/lib/api"; // ✅ using Node backend API instead of Supabase
 
 export default function Admin() {
   const [isBackfilling, setIsBackfilling] = useState(false);
 
+  // ✅ Replace Supabase function call with backend API
   const handleBackfillInvoices = async () => {
     setIsBackfilling(true);
     try {
-      const { data, error } = await supabase.functions.invoke("backfill-invoices");
-      
-      if (error) throw error;
-      
-      toast.success(`Successfully processed ${data.results?.length || 0} orders`, {
-        description) => 
-          `${r.order_number}: ${r.status === 'success' ? r.invoice_number : r.error}`
-        ).join('\n')
+      const response = await apiPost("/api/admin/backfill-invoices");
+
+      if (response.error) throw new Error(response.error);
+
+      const results = response.data?.results || [];
+
+      toast.success(`Successfully processed ${results.length} orders`, {
+        description: results
+          .map((r) =>
+            r.status === "success"
+              ? `${r.order_number}: ${r.invoice_number}`
+              : `${r.order_number}: ${r.error}`
+          )
+          .join("\n"),
       });
     } catch (error) {
-      console.error("Error backfilling invoices, error);
+      console.error("Error backfilling invoices:", error);
       toast.error("Failed to backfill invoices", {
-        description
+        description: error.message || "Unknown error occurred",
       });
     } finally {
       setIsBackfilling(false);
@@ -49,7 +76,7 @@ export default function Admin() {
         </p>
       </div>
 
-      {/* Quick Access Card */}
+      {/* ✅ Quick Access Card */}
       <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -57,13 +84,16 @@ export default function Admin() {
             Unified Transaction System
           </CardTitle>
           <CardDescription>
-            Sales, invoices, and quotes now managed in one place with multi-location support
+            Sales, invoices, and quotes now managed in one place with
+            multi-location support
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              The new Transactions system merges sales and invoices with powerful features
+              The new Transactions system merges sales and invoices with
+              powerful features:
+            </p>
             <ul className="text-sm space-y-1 ml-4 list-disc text-muted-foreground">
               <li>Unified workflow for cash sales, credit sales, and invoices</li>
               <li>Location-based stock validation and management</li>
@@ -79,8 +109,9 @@ export default function Admin() {
         </CardContent>
       </Card>
 
+      {/* ✅ Tabs Section */}
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
             Users
@@ -127,6 +158,7 @@ export default function Admin() {
           <BulkOperations />
         </TabsContent>
 
+        {/* ✅ Tools tab */}
         <TabsContent value="tools">
           <Card>
             <CardHeader>
@@ -145,10 +177,11 @@ export default function Admin() {
                   <div className="flex-1">
                     <h3 className="font-semibold">Backfill Missing Invoices</h3>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Generate invoices for paid orders that don't have invoices yet. 
-                      This will create sales records, invoice records, and notify customers.
+                      Generate invoices for paid orders that don’t have invoices
+                      yet. This will create sales records, invoice records, and
+                      notify customers.
                     </p>
-                    <Button 
+                    <Button
                       onClick={handleBackfillInvoices}
                       disabled={isBackfilling}
                       variant="outline"
@@ -160,8 +193,12 @@ export default function Admin() {
               </div>
 
               <div className="text-sm text-muted-foreground p-3 bg-muted rounded-lg">
-                <p className="font-semibold mb-1">Note
-                <p>This tool is useful when the invoice generation system was updated and previous paid orders need their invoices created retroactively.</p>
+                <p className="font-semibold mb-1">Note:</p>
+                <p>
+                  This tool is useful when the invoice generation system was
+                  updated and previous paid orders need their invoices created
+                  retroactively.
+                </p>
               </div>
             </CardContent>
           </Card>

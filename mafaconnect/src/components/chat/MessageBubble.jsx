@@ -1,5 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 
+
+
 export function MessageBubble({
   content,
   senderType,

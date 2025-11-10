@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
 import { CheckCircle2, Package } from "lucide-react";
 import { formatCurrency } from "@/lib/transactionUtils";
 import { useCustomerOrders } from "@/hooks/useCustomerOrders";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/uimain/skeleton";
 
 export default function OrderConfirmation() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -20,7 +20,7 @@ export default function OrderConfirmation() {
           const data = await getOrderById(orderId);
           setOrder(data);
         } catch (error) {
-          console.error("Error fetching order, error);
+          console.error("Error fetching order:", error);
         } finally {
           setIsLoading(false);
         }
@@ -41,9 +41,9 @@ export default function OrderConfirmation() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center space-y-4">
         <CheckCircle2 className="h-16 w-16 text-primary mx-auto" />
-        <h1 className="text-3xl font-bold">Order Confirmed</h1>
+        <h1 className="text-3xl font-bold">Order Confirmed!</h1>
         <p className="text-muted-foreground">
-          Thank you for your order. We'll send you updates.
+          Thank you for your order. We'll send you updates order progresses.
         </p>
       </div>
 

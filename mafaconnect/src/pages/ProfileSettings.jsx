@@ -1,11 +1,11 @@
-import *"react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import *"zod";
-import { useAuth } from "@/hooks/useAuth";
+import * from "zod";
+import { useAuth } from "@/hookss/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/uimain/button";
 import {
   Form,
   FormControl,
@@ -14,18 +14,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/components/uimain/form";
+import { Input } from "@/components/uimain/Input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/uimain/avatar";
 import { Loader2, User, Copy, Upload, AlertTriangle, Trash2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/uimain/alert";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/uimain/alert-dialog";
+import { Label } from "@/components/uimain/label";
 import { useAccountDeletion } from "@/hooks/useAccountDeletion";
 
 const profileSchema = z.object({
-  username
+  username: z
     .string()
     .min(3, "Username must be at least 3 characters")
     .max(30, "Username must be less than 30 characters")
@@ -43,6 +43,8 @@ const profileSchema = z.object({
     .or(z.literal("")),
 });
 
+
+
 export default function ProfileSettings() {
   const { user, loading } = useAuth();
   const { toast } = useToast();
@@ -58,7 +60,7 @@ export default function ProfileSettings() {
   const { deleteAccount, isDeleting } = useAccountDeletion();
 
   const form = useForm<ProfileFormValues>({
-    resolver),
+    resolver: zodResolver(profileSchema),
     defaultValues: {
       username: "",
       full_name: "",
@@ -83,25 +85,25 @@ export default function ProfileSettings() {
 
     if (error) {
       toast({
-        title,
-        description,
-        variant,
+        title: "Error loading profile",
+        description: error.message,
+        variant: "destructive",
       });
       return;
     }
 
     if (data) {
       form.reset({
-        username,
-        full_name,
-        phone,
+        username: data.username || "",
+        full_name: data.full_name || "",
+        phone: data.phone || "",
       });
       setAccountNumber(data.account_number || "");
       setAvatarUrl(data.avatar_url || "");
     }
   };
 
-  const handleAvatarUpload = async (event) => {
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
@@ -114,23 +116,23 @@ export default function ProfileSettings() {
         
         const { error } = await supabase
           .from("profiles")
-          .update({ avatar_url)
+          .update({ avatar_url: base64String })
           .eq("id", user.id);
 
         if (error) throw error;
 
         setAvatarUrl(base64String);
         toast({
-          title,
-          description,
+          title: "Avatar updated",
+          description: "Your profile picture has been updated successfully.",
         });
       };
       reader.readAsDataURL(file);
     } catch (error) {
       toast({
-        title,
-        description,
-        variant,
+        title: "Upload failed",
+        description: error.message,
+        variant: "destructive",
       });
     } finally {
       setUploading(false);
@@ -141,41 +143,41 @@ export default function ProfileSettings() {
     if (accountNumber) {
       navigator.clipboard.writeText(accountNumber);
       toast({
-        title,
-        description)",
+        title: "Copied!",
+        description: "Account number copied (8 digits only)",
       });
     }
   };
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: ProfileFormValues) => {
     if (!user) return;
 
     const { error } = await supabase
       .from("profiles")
       .update({
-        username,
-        full_name,
-        phone,
+        username: values.username || null,
+        full_name: values.full_name,
+        phone: values.phone || null,
       })
       .eq("id", user.id);
 
     if (error) {
       toast({
-        title,
-        description,
-        variant,
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive",
       });
       return;
     }
 
     toast({
-      title,
-      description,
+      title: "Profile updated",
+      description: "Your profile has been updated successfully.",
     });
   };
 
   const handleDeleteAccount = () => {
-    deleteAccount({ password, confirmation);
+    deleteAccount({ password: deletePassword, confirmation: deleteConfirmText });
   };
 
   if (loading) {
@@ -364,8 +366,7 @@ export default function ProfileSettings() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Warning</AlertTitle>
           <AlertDescription>
-            Account deletion is permanent and cannot be undone. This will:
-            <ul className="list-disc list-inside mt-2 space-y-1">
+            Account deletion is permanent and cannot be undone. This will = "list-disc list-inside mt-2 space-y-1">
               <li>Delete your profile and personal information</li>
               <li>Remove all your loyalty points</li>
               <li>Delete all your messages and conversations</li>

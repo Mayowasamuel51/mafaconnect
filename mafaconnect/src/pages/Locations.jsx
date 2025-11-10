@@ -1,15 +1,15 @@
-import *"react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Badge } from "@/components/uimain/Badge";
 import { useLocations } from "@/hooks/useLocations";
 import { MapPin, Plus, Search, Package, TrendingUp, Warehouse, Edit } from "lucide-react";
 import { LocationDialog } from "@/components/LocationDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 
 export default function Locations() {
   const navigate = useNavigate();
@@ -21,8 +21,8 @@ export default function Locations() {
   const [groupBy, setGroupBy] = React.useState("all");
 
   const { data: locationStats } = useQuery({
-    queryKey,
-    queryFn) => {
+    queryKey: ["location-stats"],
+    queryFn: async () => {
       const { data, error } = await supabase
         .rpc("get_location_stock_summary");
       
@@ -35,8 +35,8 @@ export default function Locations() {
     return locationStats?.find((stat) => stat.location_id === locationId);
   };
 
-  const getLocationTypeBadge = (type) => {
-    const colors= {
+  const getLocationTypeBadge = (type?) => {
+    const colors = {
       warehouse: "bg-blue-500/10 text-blue-500",
       depot: "bg-green-500/10 text-green-500",
       retail_store: "bg-purple-500/10 text-purple-500",
@@ -59,7 +59,7 @@ export default function Locations() {
         if (!acc[key]) acc[key] = [];
         acc[key].push(loc);
         return acc;
-      }, {});
+      }, {}, typeof filteredLocations>);
     }
     
     if (groupBy === "zone") {
@@ -68,7 +68,7 @@ export default function Locations() {
         if (!acc[key]) acc[key] = [];
         acc[key].push(loc);
         return acc;
-      }, {});
+      }, {}, typeof filteredLocations>);
     }
     
     return { "All Locations": filteredLocations };
@@ -127,9 +127,13 @@ export default function Locations() {
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">Loading locations...</div>
-            ){searchQuery ? "No locations found" : "No locations yet"}
+            )  = == 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? "No locations found" : "No locations yet"}
               </div>
-            ){Object.entries(groupedLocations).map(([groupName, locs]) => (
+            ) : (
+              <div className="space-y-6">
+                {Object.entries(groupedLocations).map(([groupName, locs]) => (
                   <div key={groupName}>
                     {groupBy !== "all" && (
                       <h3 className="text-lg font-semibold mb-3 text-foreground">
@@ -140,7 +144,7 @@ export default function Locations() {
                       {locs.map((location) => {
                         const stats = getLocationStats(location.id);
                         return (
-                          <Card key={location.id} className="hover
+                          <Card key={location.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
                             <CardContent className="p-6">
                               <div className="flex items-start justify-between mb-4">
                                 <div 

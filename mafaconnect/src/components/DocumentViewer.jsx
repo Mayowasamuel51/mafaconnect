@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Download, FileText, Image"lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Download, FileText, Image } from "lucide-react";
+
+
 
 export function DocumentViewer({ documentUrl, documentName, open, onOpenChange }: DocumentViewerProps) {
   const [imageError, setImageError] = useState(false);
@@ -19,7 +21,7 @@ export function DocumentViewer({ documentUrl, documentName, open, onOpenChange }
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
-              {isImage ? <ImageIcon className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+              {isImage ? <ImageIcon className="h-5 w-5" />  = "h-5 w-5" />}
               {documentName}
             </span>
             <Button variant="outline" size="sm" onClick={handleDownload}>
@@ -29,7 +31,7 @@ export function DocumentViewer({ documentUrl, documentName, open, onOpenChange }
           </DialogTitle>
         </DialogHeader>
         
-        <div className="mt-4 flex items-center justify-center bg-muted rounded-lg overflow-hidden" style={{ minHeight
+        <div className="mt-4 flex items-center justify-center bg-muted rounded-lg overflow-hidden" style={{ minHeight: '400px' }}>
           {isPDF && (
             <iframe
               src={documentUrl}

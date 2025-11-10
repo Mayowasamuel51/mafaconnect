@@ -1,8 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
+import { Button } from "@/components/uimain/button";
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+
+
 
 export function KYCStatusCard({ kycStatus, customerType, kycNotes }: KYCStatusCardProps) {
   const getStatusConfig = () => {
@@ -14,7 +16,8 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }: KYCStatusCa
           bgColor: "bg-green-50 dark:bg-green-950/30",
           borderColor: "border-green-200 dark:border-green-800",
           label: "Verified",
-          badgeVariant: "default": "Your KYC has been approved. You can now place orders.",
+          badgeVariant: "default",
+          message: "Your KYC has been approved. You can now place orders.",
           showAction: false,
         };
       case "submitted":
@@ -24,7 +27,8 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }: KYCStatusCa
           bgColor: "bg-blue-50 dark:bg-blue-950/30",
           borderColor: "border-blue-200 dark:border-blue-800",
           label: "Under Review",
-          badgeVariant: "secondary": "Your documents are being reviewed. We'll notify you once complete.",
+          badgeVariant: "secondary",
+          message: "Your documents are being reviewed. We'll notify you once complete.",
           showAction: false,
         };
       case "rejected":
@@ -34,7 +38,8 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }: KYCStatusCa
           bgColor: "bg-red-50 dark:bg-red-950/30",
           borderColor: "border-red-200 dark:border-red-800",
           label: "Resubmission Required",
-          badgeVariant: "destructive": kycNotes || "Your submission was rejected. Please review and resubmit.",
+          badgeVariant: "destructive",
+          message: kycNotes || "Your submission was rejected. Please review and resubmit.",
           showAction: true,
         };
       default: // incomplete
@@ -44,7 +49,8 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }: KYCStatusCa
           bgColor: "bg-yellow-50 dark:bg-yellow-950/30",
           borderColor: "border-yellow-200 dark:border-yellow-800",
           label: "Action Required",
-          badgeVariant: "outline": `Complete your ${customerType === "corporate" ? "corporate" : "individual"} KYC to start ordering.`,
+          badgeVariant: "outline",
+          message: `Complete your ${customerType === "corporate" ? "corporate" : "individual"} KYC to start ordering.`,
           showAction: true,
         };
     }

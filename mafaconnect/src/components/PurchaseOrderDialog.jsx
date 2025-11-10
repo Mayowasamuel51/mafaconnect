@@ -1,15 +1,17 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { Textarea } from "@/components/uimain/textarea";
 import { usePurchaseOrders } from "@/hooks/usePurchaseOrders";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { useLocations } from "@/hooks/useLocations";
 import { useProducts } from "@/hooks/useProducts";
 import { Plus, X } from "lucide-react";
+
+
 
 export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogProps) {
   const { createPurchaseOrder } = usePurchaseOrders();
@@ -22,11 +24,11 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
   const [expectedDelivery, setExpectedDelivery] = React.useState("");
   const [notes, setNotes] = React.useState("");
   const [tax, setTax] = React.useState(0);
-  const [items, setItems] = React.useState<Array<{ productId: string; quantity: number; unitCost: number }>>([]);
+  const [items, setItems] = React.useState<Array<{ productId; quantity; unitCost: number }>>([]);
   const [currentItem, setCurrentItem] = React.useState({
-    productId,
-    quantity,
-    unitCost,
+    productId: "",
+    quantity: 1,
+    unitCost: 0,
   });
 
   const handleProductChange = (productId) => {
@@ -35,7 +37,7 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
       setCurrentItem({
         ...currentItem,
         productId,
-        unitCost),
+        unitCost: Number(product.cost_price),
       });
     }
   };
@@ -43,7 +45,7 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
   const handleAddItem = () => {
     if (currentItem.productId && currentItem.quantity > 0 && currentItem.unitCost > 0) {
       setItems([...items, currentItem]);
-      setCurrentItem({ productId, quantity, unitCost);
+      setCurrentItem({ productId: "", quantity: 1, unitCost: 0 });
     }
   };
 
@@ -59,8 +61,8 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
 
     createPurchaseOrder({
       supplierId,
-      locationId,
-      expectedDelivery,
+      locationId: locationId || undefined,
+      expectedDelivery: expectedDelivery || undefined,
       items,
       notes,
       tax,
@@ -150,7 +152,7 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
                   placeholder="Quantity"
                   value={currentItem.quantity}
                   onChange={(e) =>
-                    setCurrentItem({ ...currentItem, quantity) })
+                    setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })
                   }
                 />
               </div>
@@ -160,7 +162,7 @@ export function PurchaseOrderDialog({ open, onOpenChange }: PurchaseOrderDialogP
                   placeholder="Unit Cost"
                   value={currentItem.unitCost}
                   onChange={(e) =>
-                    setCurrentItem({ ...currentItem, unitCost) })
+                    setCurrentItem({ ...currentItem, unitCost: Number(e.target.value) })
                   }
                 />
               </div>

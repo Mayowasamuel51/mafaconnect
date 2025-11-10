@@ -1,14 +1,16 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
 import { useStockTransfers } from "@/hooks/useStockTransfers";
 import { useProducts } from "@/hooks/useProducts";
 import { useLocations } from "@/hooks/useLocations";
 import { LocationSelector } from "./LocationSelector";
 import { ArrowRight, Package } from "lucide-react";
+
+
 
 export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogProps) {
   const { createTransfer } = useStockTransfers();
@@ -29,7 +31,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
       productId,
       fromLocationId,
       toLocationId,
-      quantity),
+      quantity: parseInt(quantity),
       expectedDelivery: expectedDelivery || undefined,
       notes: notes || undefined,
     });

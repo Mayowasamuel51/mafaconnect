@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
 import { AddToCartButton } from "./AddToCartButton";
 import { formatCurrency } from "@/lib/transactionUtils";
 
@@ -12,7 +12,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isOutOfStock = product.stock_qty === 0;
 
   return (
-    <Card className="group hover
+    <Card className="group hover:shadow-lg transition-shadow">
       <Link to={`/products/${product.id}`}>
         <div className="aspect-square bg-muted flex items-center justify-center rounded-t-lg overflow-hidden">
           <div className="text-muted-foreground text-sm">

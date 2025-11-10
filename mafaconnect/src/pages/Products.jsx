@@ -1,11 +1,11 @@
-import *"react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
 import { Package, Search, Plus, AlertCircle, Loader2, MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/uimain/Badge";
 import { useProducts } from "@/hooks/useProducts";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { ProductDialog } from "@/components/ProductDialog";
 import { ProductLocationStockDialog } from "@/components/ProductLocationStockDialog";
 
@@ -31,13 +31,13 @@ export default function Products() {
   }
 
   return (
-    <div className="space-y-4 sm
-      <div className="flex flex-col sm
+    <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">
             {isStaff ? "Products" : "Product Catalog"}
           </h1>
-          <p className="text-sm sm
+          <p className="text-sm sm:text-base text-muted-foreground">
             {isStaff ? "Manage your inventory and product catalog" : "Browse our available products"}
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function Products() {
             {filteredProducts?.map((product) => (
               <div
                 key={product.id}
-                className="flex flex-col sm
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
               >
                 <div className="flex items-center gap-4 flex-1">
                   <div className="p-3 rounded-lg bg-gradient-primary">

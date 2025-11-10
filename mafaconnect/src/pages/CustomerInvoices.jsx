@@ -1,11 +1,11 @@
-import *"react";
-import { useAuth } from "@/hooks/useAuth";
+import React from "react";
+import { useAuth } from "@/hookss/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
+import { Input } from "@/components/uimain/Input";
+import { Button } from "@/components/uimain/button";
 import { Loader2, Search, Download } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -15,8 +15,8 @@ export default function CustomerInvoices() {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const { data: invoices, isLoading } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-invoices", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
         .select(`
@@ -33,7 +33,7 @@ export default function CustomerInvoices() {
           )
         `)
         .eq("customer_id", user?.id)
-        .order("created_at", { ascending);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -74,7 +74,7 @@ export default function CustomerInvoices() {
         .select("*")
         .in("setting_key", ["business_name", "business_address", "business_phone", "business_email"]);
 
-      const settings= {};
+      const settings = {};
       storeSettings?.forEach(s => {
         settings[s.setting_key] = s.setting_value;
       });
@@ -178,7 +178,7 @@ export default function CustomerInvoices() {
           ${invoice.notes ? `<div class="invoice-details"><strong>Notes:</strong> ${invoice.notes}</div>` : ''}
 
           <div class="footer">
-            <p>Thank you for your business</p>
+            <p>Thank you for your business!</p>
             <p>Generated on ${format(new Date(), "MMM d, yyyy 'at' h:mm a")}</p>
           </div>
         </body>
@@ -186,7 +186,7 @@ export default function CustomerInvoices() {
       `;
 
       // Create blob and download
-      const blob = new Blob([invoiceHTML], { type);
+      const blob = new Blob([invoiceHTML], { type: 'text/html' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -196,9 +196,9 @@ export default function CustomerInvoices() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success("Invoice downloaded successfully Open the file and print/save.");
+      toast.success("Invoice downloaded successfully! Open the file and print/save");
     } catch (error) {
-      console.error("Error downloading invoice, error);
+      console.error("Error downloading invoice:", error);
       toast.error("Failed to download invoice");
     }
   };
@@ -246,7 +246,7 @@ export default function CustomerInvoices() {
                         <CardDescription>
                           {invoice.sales?.customer_orders?.[0] && (
                             <>
-                              Order
+                              Order: {invoice.sales.customer_orders[0].order_number}
                               {" • "}
                             </>
                           )}
@@ -290,7 +290,7 @@ export default function CustomerInvoices() {
                       </div>
                       {invoice.notes && (
                         <p className="text-sm text-muted-foreground pt-2">
-                          Note
+                          Note: {invoice.notes}
                         </p>
                       )}
                       <div className="pt-2">
@@ -309,7 +309,9 @@ export default function CustomerInvoices() {
                 </Card>
               ))}
             </div>
-          ){searchQuery ? "No invoices found matching your search" : "No invoices yet"}
+          ) : (
+            <p className="text-center text-muted-foreground py-8">
+              {searchQuery ? "No invoices found matching your search" : "No invoices yet"}
             </p>
           )}
         </CardContent>

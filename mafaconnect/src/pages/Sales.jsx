@@ -1,15 +1,15 @@
-import *"react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/uimain/select";
 import {
   Drawer,
   DrawerClose,
@@ -18,7 +18,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "@/components/ui/drawer";
+} from "@/components/uimain/drawer";
 import { Plus, Search, Receipt, Loader2, X } from "lucide-react";
 import { useSales } from "@/hooks/useSales";
 import { useProducts } from "@/hooks/useProducts";
@@ -39,9 +39,9 @@ export default function Sales() {
   const [locationId, setLocationId] = React.useState("");
   const [paymentMethod, setPaymentMethod] = React.useState("");
   const [selectedProducts, setSelectedProducts] = React.useState<Array<{
-    product_id: string;
-    quantity: number;
-    unit_price: number;
+    product_id;
+    quantity;
+    unit_price;
   }>>([]);
   const [currentProduct, setCurrentProduct] = React.useState("");
   const [currentQuantity, setCurrentQuantity] = React.useState(1);
@@ -57,9 +57,9 @@ export default function Sales() {
     setSelectedProducts([
       ...selectedProducts,
       {
-        product_id,
-        quantity,
-        unit_price),
+        product_id: currentProduct,
+        quantity: currentQuantity,
+        unit_price: Number(product.sale_price),
       },
     ]);
     setCurrentProduct("");
@@ -80,11 +80,11 @@ export default function Sales() {
     if (!paymentMethod) return;
 
     await createSale.mutateAsync({
-      customer_id,
-      location_id,
-      items,
-      payment_method,
-      discount_amount,
+      customer_id: customerId || undefined,
+      location_id: locationId || undefined,
+      items: selectedProducts,
+      payment_method: paymentMethod,
+      discount_amount: discount,
     });
 
     setShowNewSale(false);
@@ -105,11 +105,11 @@ export default function Sales() {
   });
 
   return (
-    <div className="space-y-4 sm
-      <div className="flex flex-col sm
+    <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm
-          <p className="text-sm sm
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Sales</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create new transactions and view sales history
           </p>
         </div>
@@ -471,14 +471,16 @@ export default function Sales() {
             <div className="flex justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ){filteredSales.map((sale) => {
+          ) : filteredSales && filteredSales.length > 0 ? (
+            <div className="space-y-4">
+              {filteredSales.map((sale) => {
                 const customer = sale.customers;
                 const saleItems = sale.sale_items;
                 
                 return (
                   <div
                     key={sale.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover
+                    className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3 rounded-lg bg-gradient-primary">
@@ -508,7 +510,9 @@ export default function Sales() {
                 );
               })}
             </div>
-          ){searchQuery ? "No sales found matching your search." : "No sales yet. Create your first sale"}
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              {searchQuery ? "No sales found matching your search." : "No sales yet. Create your first sale!"}
             </div>
           )}
         </CardContent>

@@ -1,25 +1,27 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+
+
 
 export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = React.useState(false);
   const [formData, setFormData] = React.useState({
-    name,
-    email,
-    phone,
-    external_id,
+    name: "",
+    email: "",
+    phone: "",
+    external_id: "",
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -28,10 +30,10 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
       const { data: customer, error: customerError } = await supabase
         .from("customers")
         .insert({
-          name,
-          email,
-          phone,
-          external_id,
+          name: formData.name,
+          email: formData.email || null,
+          phone: formData.phone || null,
+          external_id: formData.external_id || null,
         })
         .select()
         .single();
@@ -42,32 +44,32 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
       const { error: loyaltyError } = await supabase
         .from("loyalty_accounts")
         .insert({
-          customer_id,
-          points_balance,
-          tier,
+          customer_id: customer.id,
+          points_balance: 0,
+          tier: "Silver",
         });
 
       if (loyaltyError) throw loyaltyError;
 
       toast({
-        title,
-        description,
+        title: "Customer created",
+        description: "Customer and loyalty account created successfully.",
       });
 
-      queryClient.invalidateQueries({ queryKey);
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
 
       setFormData({
-        name,
-        email,
-        phone,
-        external_id,
+        name: "",
+        email: "",
+        phone: "",
+        external_id: "",
       });
       onOpenChange(false);
     } catch (error) {
       toast({
-        title,
-        description,
-        variant,
+        title: "Error creating customer",
+        description: error.message,
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -76,7 +78,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Customer</DialogTitle>
         </DialogHeader>
@@ -86,7 +88,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name)}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
           </div>
@@ -97,7 +99,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email)}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -107,7 +109,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
               id="phone"
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone)}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
           </div>
 
@@ -116,7 +118,7 @@ export function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
             <Input
               id="external_id"
               value={formData.external_id}
-              onChange={(e) => setFormData({ ...formData, external_id)}
+              onChange={(e) => setFormData({ ...formData, external_id: e.target.value })}
               placeholder="Optional external system ID"
             />
           </div>

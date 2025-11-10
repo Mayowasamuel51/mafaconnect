@@ -1,8 +1,8 @@
-import *"react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Badge } from "@/components/uimain/Badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,7 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@/components/uimain/alert-dialog";
 import { useInvoices } from "@/hooks/useInvoices";
 import { FileText, Plus, Search, Eye, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
@@ -115,12 +115,16 @@ export default function Invoices() {
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">Loading invoices...</div>
-            ){searchQuery ? "No invoices found" : "No invoices yet"}
+            )  = == 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? "No invoices found" : "No invoices yet"}
               </div>
-            ){filteredInvoices?.map((invoice) => (
+            ) : (
+              <div className="space-y-4">
+                {filteredInvoices?.map((invoice) => (
                   <div
                     key={invoice.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <FileText className="h-8 w-8 text-primary" />
@@ -162,7 +166,7 @@ export default function Invoices() {
                               size="sm"
                               variant="outline"
                               onClick={() =>
-                                updateInvoiceStatus({ id, status)
+                                updateInvoiceStatus({ id: invoice.id, status: "sent" })
                               }
                             >
                               Send
@@ -173,7 +177,7 @@ export default function Invoices() {
                           <Button
                             size="sm"
                             onClick={() =>
-                              updateInvoiceStatus({ id, status)
+                              updateInvoiceStatus({ id: invoice.id, status: "paid" })
                             }
                           >
                             Mark Paid
@@ -210,7 +214,7 @@ export default function Invoices() {
         onOpenChange={setShowDetailsDialog}
         onEdit={() => {
           setShowDetailsDialog(false);
-          handleEdit(selectedInvoiceId);
+          handleEdit(selectedInvoiceId!);
         }}
       />
 

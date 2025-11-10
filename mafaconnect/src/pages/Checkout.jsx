@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import *"zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import * from "zod";
+import { Button } from "@/components/uimain/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/uimain/form";
+import { Input } from "@/components/uimain/Input";
+import { Textarea } from "@/components/uimain/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { RadioGroup, RadioGroupItem } from "@/components/uimain/radio-group";
 import { useCart } from "@/hooks/useCart";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { useLocations } from "@/hooks/useLocations";
 import { useKYCStatus } from "@/hooks/useKYC";
 import { formatCurrency } from "@/lib/transactionUtils";
@@ -22,7 +22,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, ArrowLeft, Package, Truck, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BankDetailsCard } from "@/components/BankDetailsCard";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/uimain/alert";
 
 const NIGERIAN_STATES = [
   "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue",
@@ -33,7 +33,7 @@ const NIGERIAN_STATES = [
 ];
 
 const checkoutSchema = z.object({
-  delivery_type, "pickup"]),
+  delivery_type: z.enum(["delivery", "pickup"]),
   pickup_location_id: z.string().optional(),
   shipping_address: z.string().optional(),
   shipping_city: z.string().optional(),
@@ -52,6 +52,8 @@ const checkoutSchema = z.object({
   }
   return true;
 }, { message: "Required fields missing for selected delivery type" });
+
+
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -73,7 +75,7 @@ export default function Checkout() {
   const taxAmount = (cartTotal * taxRate) / 100;
 
   const form = useForm<CheckoutFormData>({
-    resolver),
+    resolver: zodResolver(checkoutSchema),
     defaultValues: {
       delivery_type: "delivery",
       payment_method: "cash_on_delivery",
@@ -94,17 +96,17 @@ export default function Checkout() {
     }
   }, [pickupLocationId, locations]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: CheckoutFormData) => {
     if (!cart || cart.items.length === 0) {
-      toast({ title, variant);
+      toast({ title: "Cart is empty", variant: "destructive" });
       return;
     }
 
     if (!isKYCApproved) {
       toast({ 
-        title, 
-        description,
-        variant
+        title: "KYC verification required", 
+        description: "Please complete your KYC verification before placing orders",
+        variant: "destructive" 
       });
       return;
     }
@@ -112,25 +114,25 @@ export default function Checkout() {
     setIsSubmitting(true);
     try {
       const { data: orderData, error } = await supabase.functions.invoke("create-customer-order", {
-        body,
+        body: data,
       });
 
       if (error) throw error;
 
       // Invalidate cart to refresh UI
-      await queryClient.invalidateQueries({ queryKey);
+      await queryClient.invalidateQueries({ queryKey: ["cart"] });
       
       toast({
-        title,
-        description,
+        title: "Order placed successfully!",
+        description: `Order ${orderData.order.order_number} has been created`,
       });
 
       navigate(`/order-confirmation/${orderData.order.id}`);
     } catch (error) {
       toast({
-        title,
-        description,
-        variant,
+        title: "Error placing order",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -147,12 +149,12 @@ export default function Checkout() {
   }
 
   return (
-    <div className="space-y-4 sm
-      <div className="flex items-center gap-3 sm
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 pb-[200px] lg:pb-6">
+      <div className="flex items-center gap-3 sm:gap-4">
         <Button variant="ghost" asChild size="sm" className="h-9">
-          <Link to="/cart"><ArrowLeft className="h-4 w-4 sm="hidden sm
+          <Link to="/cart"><ArrowLeft className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Back to Cart</span></Link>
         </Button>
-        <h1 className="text-2xl sm
+        <h1 className="text-2xl sm:text-3xl font-bold">Checkout</h1>
       </div>
       
       {!isKYCApproved && (
@@ -180,8 +182,8 @@ export default function Checkout() {
                 <FormField control={form.control} name="delivery_type" render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm
-                        <div className="flex items-center space-x-3 border rounded-lg p-3 sm={() => field.onChange("delivery")}>
+                      <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div className="flex items-center space-x-3 border rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-accent" onClick={() => field.onChange("delivery")}>
                           <RadioGroupItem value="delivery" id="delivery" />
                           <label htmlFor="delivery" className="flex-1 cursor-pointer">
                             <div className="flex items-center gap-2"><Truck className="h-4 w-4" /><span className="font-semibold text-sm sm:text-base">Delivery</span></div>

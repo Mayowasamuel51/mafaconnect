@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, Trash2, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/uimain/button";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/uimain/sheet";
+import { Badge } from "@/components/uimain/Badge";
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/transactionUtils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
+import { ScrollArea } from "@/components/uimain/scroll-area";
+import { SwipeToDelete } from "@/components/uimain/swipe-to-delete";
 
 export function ShoppingCartSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +22,7 @@ export function ShoppingCartSidebar() {
   const handleQuantityChange = (itemId, currentQty, change) => {
     const newQty = currentQty + change;
     if (newQty > 0) {
-      updateQuantity({ itemId, quantity);
+      updateQuantity({ itemId, quantity: newQty });
     }
   };
 

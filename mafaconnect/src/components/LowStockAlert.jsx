@@ -1,4 +1,4 @@
-import *"react";
+import React from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle } from "lucide-react";
@@ -16,8 +16,8 @@ export function LowStockAlert() {
 
     if (lowStockProducts.length > 0) {
       toast({
-        title,
-        description) need restocking`,
+        title: "Low Stock Alert",
+        description: `${lowStockProducts.length} product(s) need restocking`,
         variant: "destructive",
         action: (
           <div className="flex items-center gap-2">

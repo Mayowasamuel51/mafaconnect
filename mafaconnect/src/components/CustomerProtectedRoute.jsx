@@ -1,8 +1,10 @@
-import *"react";
+import React from "react";
 import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { Loader2 } from "lucide-react";
+
+
 
 export function CustomerProtectedRoute({ children }: CustomerProtectedRouteProps) {
   const { user, loading, isStaff } = useAuth();

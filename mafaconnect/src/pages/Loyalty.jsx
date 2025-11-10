@@ -1,11 +1,11 @@
-import *"react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
 import { Plus, Gift, Award, TrendingUp, Coins, Loader2 } from "lucide-react";
 import { useRewards } from "@/hooks/useRewards";
 import { useLoyaltyStats } from "@/hooks/useLoyaltyStats";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { RewardDialog } from "@/components/RewardDialog";
@@ -21,8 +21,8 @@ export default function Loyalty() {
 
   // Fetch customer's loyalty account
   const { data: loyaltyAccount, isLoading: loadingAccount } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-loyalty-account", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("loyalty_accounts")
         .select("*")
@@ -36,13 +36,13 @@ export default function Loyalty() {
 
   // Fetch customer's recent transactions
   const { data: recentTransactions } = useQuery({
-    queryKey, loyaltyAccount?.id],
-    queryFn) => {
+    queryKey: ["customer-loyalty-transactions", loyaltyAccount?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("loyalty_transactions")
         .select("*")
         .eq("loyalty_account_id", loyaltyAccount?.id)
-        .order("created_at", { ascending)
+        .order("created_at", { ascending: false })
         .limit(10);
       if (error) throw error;
       return data;
@@ -83,7 +83,7 @@ export default function Loyalty() {
     {
       name: "Platinum",
       minPoints: 5000,
-      maxPoints: null,
+      maxPoints,
       benefits: ["Earn 2 points per ₦100", "VIP support", "Free shipping", "Early access"],
       color: "text-accent",
     },
@@ -99,7 +99,7 @@ export default function Loyalty() {
         </div>
 
         {/* Customer Stats */}
-        <div className="grid gap-4 md
+        <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Points Balance</CardTitle>
@@ -338,7 +338,7 @@ export default function Loyalty() {
             {tierConfig.map((tier) => (
               <div
                 key={tier.name}
-                className="p-6 rounded-xl border-2 bg-secondary/30 hover
+                className="p-6 rounded-xl border-2 bg-secondary/30 hover:bg-secondary/50 transition-all"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Award className={`h-6 w-6 ${tier.color}`} />
@@ -372,7 +372,7 @@ export default function Loyalty() {
             {rewards?.map((reward) => (
               <div
                 key={reward.id}
-                className="p-6 rounded-lg bg-secondary/50 hover
+                className="p-6 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -396,7 +396,7 @@ export default function Loyalty() {
                     </Badge>
                     {reward.stock_limit && (
                       <span className="text-sm text-muted-foreground">
-                        Stock
+                        Stock: {reward.stock_limit}
                       </span>
                     )}
                   </div>

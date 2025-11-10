@@ -1,8 +1,8 @@
-import *"react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Badge } from "@/components/uimain/Badge";
 import { useSuppliers } from "@/hooks/useSuppliers";
 import { Truck, Plus, Search, Mail, Phone } from "lucide-react";
 import { SupplierDialog } from "@/components/SupplierDialog";
@@ -44,10 +44,14 @@ export default function Suppliers() {
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">Loading suppliers...</div>
-            ){searchQuery ? "No suppliers found" : "No suppliers yet"}
+            )  = == 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? "No suppliers found" : "No suppliers yet"}
               </div>
-            ){filteredSuppliers?.map((supplier) => (
-                  <Card key={supplier.id} className="hover
+            ) : (
+              <div className="space-y-4">
+                {filteredSuppliers?.map((supplier) => (
+                  <Card key={supplier.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-4 flex-1">
@@ -61,7 +65,7 @@ export default function Suppliers() {
                             </div>
                             {supplier.contact_person && (
                               <p className="text-sm text-muted-foreground mb-1">
-                                Contact
+                                Contact: {supplier.contact_person}
                               </p>
                             )}
                             <div className="flex flex-wrap gap-4 mt-2">
@@ -80,7 +84,7 @@ export default function Suppliers() {
                             </div>
                             {supplier.payment_terms && (
                               <p className="text-sm text-muted-foreground mt-2">
-                                Payment Terms
+                                Payment Terms: {supplier.payment_terms}
                               </p>
                             )}
                           </div>

@@ -1,10 +1,12 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
 import { useSuppliers } from "@/hooks/useSuppliers";
+
+
 
 export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
   const { createSupplier } = useSuppliers();
@@ -21,12 +23,12 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
 
     createSupplier({
       name,
-      contact_person,
-      email,
-      phone,
-      address,
-      payment_terms,
-      notes,
+      contact_person: contactPerson || undefined,
+      email: email || undefined,
+      phone: phone || undefined,
+      address: address || undefined,
+      payment_terms: paymentTerms || undefined,
+      notes: notes || undefined,
     });
 
     onOpenChange(false);

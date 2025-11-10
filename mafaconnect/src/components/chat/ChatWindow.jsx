@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { MessageBubble } from "./MessageBubble";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/uimain/button";
+import { Textarea } from "@/components/uimain/textarea";
 import { Send, Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
+
+
 
 export function ChatWindow({ conversationId, conversationSubject, showHeader = true }: ChatWindowProps) {
   const { user, isStaff } = useAuth();
@@ -14,13 +16,13 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = (e) => {
+  const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() && conversationId) {
-      sendMessage({ content);
+      sendMessage({ content: newMessage });
       setNewMessage("");
     }
   };
@@ -45,8 +47,8 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
     <div className="flex flex-col h-full">
       {/* Header - Hidden on mobile when back button is shown */}
       {showHeader && (
-        <div className="border-b p-3 sm
-          <h2 className="font-semibold text-base sm
+        <div className="border-b p-3 sm:p-4">
+          <h2 className="font-semibold text-base sm:text-lg">{conversationSubject || "Conversation"}</h2>
         </div>
       )}
 
@@ -54,9 +56,11 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
-            No messages yet. Start the conversation
+            No messages yet. Start the conversation!
           </div>
-        ){messages.map((message) => (
+        ) : (
+          <>
+            {messages.map((message) => (
               <MessageBubble
                 key={message.id}
                 content={message.content}

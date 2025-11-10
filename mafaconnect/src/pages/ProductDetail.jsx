@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
+import { Card, CardContent } from "@/components/uimain/card";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { formatCurrency } from "@/lib/transactionUtils";
 import { ArrowLeft, Package } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/uimain/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -43,9 +43,9 @@ export default function ProductDetail() {
         }
       } catch (error) {
         toast({
-          title,
-          description,
-          variant,
+          title: "Error loading product",
+          description: error.message,
+          variant: "destructive",
         });
       } finally {
         setIsLoading(false);
@@ -61,7 +61,7 @@ export default function ProductDetail() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-8 w-32" />
-        <div className="grid grid-cols-1 md
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Skeleton className="aspect-square rounded-lg" />
           <div className="space-y-4">
             <Skeleton className="h-8 w-3/4" />
@@ -101,7 +101,7 @@ export default function ProductDetail() {
         </Link>
       </Button>
 
-      <div className="grid grid-cols-1 md
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
           <div className="text-6xl font-bold text-muted-foreground">
@@ -121,7 +121,7 @@ export default function ProductDetail() {
               {formatCurrency(product.sale_price)}
             </span>
             {isLowStock && (
-              <Badge variant="destructive">Only {product.stock_qty} left</Badge>
+              <Badge variant="destructive">Only {product.stock_qty} left!</Badge>
             )}
             {isOutOfStock && <Badge variant="outline">Out of Stock</Badge>}
             {!isLowStock && !isOutOfStock && (

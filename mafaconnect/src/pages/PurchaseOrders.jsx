@@ -1,8 +1,8 @@
-import *"react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Badge } from "@/components/uimain/Badge";
 import { usePurchaseOrders } from "@/hooks/usePurchaseOrders";
 import { ShoppingBag, Plus, Search } from "lucide-react";
 import { format } from "date-fns";
@@ -61,12 +61,16 @@ export default function PurchaseOrders() {
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">Loading purchase orders...</div>
-            ){searchQuery ? "No purchase orders found" : "No purchase orders yet"}
+            )  = == 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? "No purchase orders found" : "No purchase orders yet"}
               </div>
-            ){filteredPOs?.map((po) => (
+            ) : (
+              <div className="space-y-4">
+                {filteredPOs?.map((po) => (
                   <div
                     key={po.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <ShoppingBag className="h-8 w-8 text-primary" />
@@ -97,8 +101,8 @@ export default function PurchaseOrders() {
                           className="mt-2"
                           onClick={() =>
                             receivePurchaseOrder({ 
-                              id, 
-                              locationId
+                              id: po.id, 
+                              locationId: po.location_id || undefined 
                             })
                           }
                         >

@@ -1,13 +1,15 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { Textarea } from "@/components/uimain/textarea";
 import { useReturns } from "@/hooks/useReturns";
 import { useSales } from "@/hooks/useSales";
 import { Plus, X } from "lucide-react";
+
+
 
 export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
   const { createReturn } = useReturns();
@@ -18,7 +20,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
   const [refundMethod, setRefundMethod] = React.useState("cash");
   const [notes, setNotes] = React.useState("");
   const [items, setItems] = React.useState<
-    Array<{ productId: string; quantity: number; unitPrice: number; condition: string }>
+    Array<{ productId; quantity; unitPrice; condition: string }>
   >([]);
 
   const selectedSale = sales?.find((s) => s.id === saleId);
@@ -28,7 +30,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
 
     createReturn({
       saleId,
-      customerId,
+      customerId: selectedSale?.customer_id || undefined,
       reason,
       items,
       refundMethod,
@@ -105,7 +107,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
             <div className="border rounded-lg p-4 space-y-2">
               <h3 className="font-semibold">Sale Items</h3>
               <p className="text-sm text-muted-foreground">
-                Select items to return (Total).toLocaleString()})
+                Select items to return (Total: ₦{Number(selectedSale.total_amount).toLocaleString()})
               </p>
               <div className="text-sm text-muted-foreground">
                 Note: Fetching sale items requires additional implementation

@@ -1,10 +1,10 @@
 import { useMemo, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { TrendingUp, Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSales } from "@/hooks/useSales";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/uimain/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from "recharts";
 import { format, subDays, startOfDay } from "date-fns";
 import { ExportButton } from "@/components/ExportButton";
@@ -23,13 +23,13 @@ export default function Analytics() {
       .on(
         'postgres_changes',
         {
-          event,
-          schema,
-          table
+          event: '*',
+          schema: 'public',
+          table: 'sales'
         },
         () => {
-          queryClient.invalidateQueries({ queryKey);
-          queryClient.invalidateQueries({ queryKey);
+          queryClient.invalidateQueries({ queryKey: ["sales"] });
+          queryClient.invalidateQueries({ queryKey: ["analytics"] });
         }
       )
       .subscribe();
@@ -41,8 +41,8 @@ export default function Analytics() {
 
   const chartData = useMemo(() => {
     if (!sales) return [];
-    const last30Days = Array.from({ length, (_, i) => ({
-      date), 29 - i)), "MMM dd"),
+    const last30Days = Array.from({ length: 30 }, (_, i) => ({
+      date: format(startOfDay(subDays(new Date(), 29 - i)), "MMM dd"),
       revenue: 0,
       sales: 0,
     }));
@@ -74,15 +74,15 @@ export default function Analytics() {
   }, [sales]);
 
   return (
-    <div className="space-y-4 sm
-      <div className="flex flex-col sm
+    <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm
-          <p className="text-sm sm
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Analytics</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Track performance and generate insights</p>
         </div>
-        <div className="flex flex-col sm
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Select defaultValue="30days">
-            <SelectTrigger className="h-11 w-full sm
+            <SelectTrigger className="h-11 w-full sm:w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -102,7 +102,13 @@ export default function Analytics() {
         <div className="flex justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      ){analytics?.totalRevenue.toLocaleString() || 0}</p>
+      ) : (
+        <>
+          <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
+            <Card className="shadow-card">
+              <CardContent className="p-3 sm:p-6">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">Total Revenue</p>
+                <p className="text-xl sm:text-3xl font-bold text-foreground mb-2">₦{analytics?.totalRevenue.toLocaleString() || 0}</p>
                 <div className="flex items-center gap-2 text-success">
                   <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="text-xs sm:text-sm font-medium">All time</span>

@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/uimain/button";
 import { Download } from "lucide-react";
 import { format } from "date-fns";
+
+
 
 export function ExportButton({ data, filename, headers }: ExportButtonProps) {
   const exportToCSV = () => {
@@ -22,7 +24,7 @@ export function ExportButton({ data, filename, headers }: ExportButtonProps) {
     ].join("\n");
 
     // Create blob and download
-    const blob = new Blob([csvContent], { type=utf-8;" });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     

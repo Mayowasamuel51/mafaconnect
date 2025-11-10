@@ -1,16 +1,18 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { ScrollArea } from "@/components/uimain/scroll-area";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { Textarea } from "@/components/uimain/textarea";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useProducts } from "@/hooks/useProducts";
 import { Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
+
 
 export function InvoiceDialog({
   open,
@@ -28,19 +30,19 @@ export function InvoiceDialog({
   const [discount, setDiscount] = React.useState(0);
   const [tax, setTax] = React.useState(0);
   const [items, setItems] = React.useState<
-    Array<{ productId: string; description: string; quantity: number; unitPrice: number }>
+    Array<{ productId; description; quantity; unitPrice: number }>
   >([]);
   const [currentItem, setCurrentItem] = React.useState({
-    productId,
-    description,
-    quantity,
-    unitPrice,
+    productId: "",
+    description: "",
+    quantity: 1,
+    unitPrice: 0,
   });
 
   const handleAddItem = () => {
     if (currentItem.description && currentItem.quantity > 0 && currentItem.unitPrice > 0) {
       setItems([...items, currentItem]);
-      setCurrentItem({ productId, description, quantity, unitPrice);
+      setCurrentItem({ productId: "", description: "", quantity: 1, unitPrice: 0 });
     }
   };
 
@@ -54,8 +56,8 @@ export function InvoiceDialog({
       setCurrentItem({
         ...currentItem,
         productId,
-        description,
-        unitPrice),
+        description: product.name,
+        unitPrice: Number(product.sale_price),
       });
     }
   };
@@ -86,10 +88,10 @@ export function InvoiceDialog({
           setTax(Number(invoice.tax_amount));
           setItems(
             invoice.invoice_items?.map((item) => ({
-              productId,
-              description,
-              quantity,
-              unitPrice),
+              productId: item.product_id || "",
+              description: item.description,
+              quantity: item.quantity,
+              unitPrice: Number(item.unit_price),
             })) || []
           );
         }
@@ -111,7 +113,7 @@ export function InvoiceDialog({
     };
 
     if (mode === "edit" && invoiceId) {
-      updateInvoice({ id, invoiceData });
+      updateInvoice({ id: invoiceId, invoiceData });
     } else {
       createInvoice(invoiceData);
     }
@@ -184,7 +186,7 @@ export function InvoiceDialog({
                   placeholder="Description"
                   value={currentItem.description}
                   onChange={(e) =>
-                    setCurrentItem({ ...currentItem, description)
+                    setCurrentItem({ ...currentItem, description: e.target.value })
                   }
                 />
               </div>
@@ -194,7 +196,7 @@ export function InvoiceDialog({
                   placeholder="Qty"
                   value={currentItem.quantity}
                   onChange={(e) =>
-                    setCurrentItem({ ...currentItem, quantity) })
+                    setCurrentItem({ ...currentItem, quantity: Number(e.target.value) })
                   }
                 />
               </div>
@@ -204,7 +206,7 @@ export function InvoiceDialog({
                   placeholder="Price"
                   value={currentItem.unitPrice}
                   onChange={(e) =>
-                    setCurrentItem({ ...currentItem, unitPrice) })
+                    setCurrentItem({ ...currentItem, unitPrice: Number(e.target.value) })
                   }
                 />
               </div>

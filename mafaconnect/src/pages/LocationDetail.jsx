@@ -1,9 +1,9 @@
-import *"react";
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
 import { useLocations } from "@/hooks/useLocations";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { LocationDialog } from "@/components/LocationDialog";
 import { BulkAddProductsDialog } from "@/components/BulkAddProductsDialog";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 
 export default function LocationDetail() {
   const { id } = useParams();
@@ -33,8 +33,8 @@ export default function LocationDetail() {
   const location = locations?.find((loc) => loc.id === id);
 
   const { data: locationStats } = useQuery({
-    queryKey, id],
-    queryFn) => {
+    queryKey: ["location-detail-stats", id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .rpc("get_location_stock_summary");
       
@@ -45,8 +45,8 @@ export default function LocationDetail() {
   });
 
   const { data: recentSales } = useQuery({
-    queryKey, id],
-    queryFn) => {
+    queryKey: ["location-recent-sales", id],
+    queryFn: async () => {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -55,7 +55,7 @@ export default function LocationDetail() {
         .select("id, created_at, total_amount, status")
         .eq("location_id", id)
         .gte("created_at", thirtyDaysAgo.toISOString())
-        .order("created_at", { ascending)
+        .order("created_at", { ascending: false })
         .limit(10);
       
       if (error) throw error;
@@ -65,19 +65,19 @@ export default function LocationDetail() {
   });
 
   const { data: activeTransfers } = useQuery({
-    queryKey, id],
-    queryFn) => {
+    queryKey: ["location-active-transfers", id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("stock_movements")
         .select(`
           *,
-          product, sku),
-          from_location:locationsstock_movements_from_location_id_fkey(name),
-          to_location:locationsstock_movements_to_location_id_fkey(name)
+          product:products(name, sku),
+          from_location:locations!stock_movements_from_location_id_fkey(name),
+          to_location:locations!stock_movements_to_location_id_fkey(name)
         `)
         .or(`from_location_id.eq.${id},to_location_id.eq.${id}`)
         .in("status", ["pending", "in_transit"])
-        .order("created_at", { ascending);
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
@@ -86,16 +86,16 @@ export default function LocationDetail() {
   });
 
   const { data: productStock } = useQuery({
-    queryKey, id],
-    queryFn) => {
+    queryKey: ["location-product-stock", id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("product_locations")
         .select(`
           *,
-          product, sku, sale_price)
+          product:products(name, sku, sale_price)
         `)
         .eq("location_id", id)
-        .order("stock_qty", { ascending);
+        .order("stock_qty", { ascending: false });
       
       if (error) throw error;
       return data;
@@ -104,8 +104,8 @@ export default function LocationDetail() {
   });
 
   const { data: manager } = useQuery({
-    queryKey, location?.manager_id],
-    queryFn) => {
+    queryKey: ["location-manager", location?.manager_id],
+    queryFn: async () => {
       if (!location?.manager_id) return null;
       
       const { data, error } = await supabase
@@ -132,8 +132,8 @@ export default function LocationDetail() {
     );
   }
 
-  const getLocationTypeBadge = (type) => {
-    const colors= {
+  const getLocationTypeBadge = (type?) => {
+    const colors = {
       warehouse: "bg-blue-500/10 text-blue-500",
       depot: "bg-green-500/10 text-green-500",
       retail_store: "bg-purple-500/10 text-purple-500",
@@ -334,7 +334,7 @@ export default function LocationDetail() {
                     <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium">{item.product.name}</p>
-                        <p className="text-sm text-muted-foreground">SKU
+                        <p className="text-sm text-muted-foreground">SKU: {item.product.sku}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{item.stock_qty} units</p>
@@ -394,9 +394,9 @@ export default function LocationDetail() {
                         <Badge>{transfer.status}</Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        <p>From
-                        <p>To
-                        <p>Quantity
+                        <p>From: {transfer.from_location?.name || "N/A"}</p>
+                        <p>To: {transfer.to_location?.name || "N/A"}</p>
+                        <p>Quantity: {transfer.quantity} units</p>
                       </div>
                     </div>
                   ))

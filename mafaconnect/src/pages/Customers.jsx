@@ -1,9 +1,9 @@
-import *"react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
 import { UserPlus, Search, User, Award, Loader2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/uimain/Badge";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CustomerDialog } from "@/components/CustomerDialog";
 
@@ -40,11 +40,11 @@ export default function Customers() {
   };
 
   return (
-    <div className="space-y-4 sm
-      <div className="flex flex-col sm
+    <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm
-          <p className="text-sm sm
+          <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Customers</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage customer profiles and loyalty status
           </p>
         </div>
@@ -81,14 +81,14 @@ export default function Customers() {
               return (
                 <div
                   key={customer.id}
-                  className="flex flex-col sm
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                 >
-                  <div className="flex items-center gap-3 sm
+                  <div className="flex items-center gap-3 sm:gap-4 flex-1">
                     <div className="p-3 rounded-lg bg-gradient-primary flex-shrink-0">
                       <User className="h-5 w-5 text-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 sm
+                      <div className="flex items-center gap-2 sm:gap-3 mb-1 flex-wrap">
                         <p className="font-semibold text-foreground">
                           {customer.name}
                         </p>

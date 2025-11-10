@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/uimain/button";
+import { Card } from "@/components/uimain/card";
 import { MessageSquare, X } from "lucide-react";
+
+
 
 export function MessageNotificationToast({
   senderName,

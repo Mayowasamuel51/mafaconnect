@@ -8,7 +8,9 @@ import {
   MoreHorizontal
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/uimain/Badge";
+
+
 
 export function MobileBottomNav({ isStaff, unreadCount, onMoreClick }: MobileBottomNavProps) {
   const location = useLocation();
@@ -30,7 +32,7 @@ export function MobileBottomNav({ isStaff, unreadCount, onMoreClick }: MobileBot
   const navItems = isStaff ? staffNavItems : customerNavItems;
 
   return (
-    <nav className="lg
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t pb-safe">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.href;

@@ -1,11 +1,11 @@
-import *"react";
-import { useAuth } from "@/hooks/useAuth";
+import React from "react";
+import { useAuth } from "@/hookss/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
+import { Input } from "@/components/uimain/Input";
+import { Button } from "@/components/uimain/button";
 import { Loader2, Search, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +16,8 @@ export default function CustomerOrders() {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const { data: orders, isLoading } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-orders", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("customer_orders")
         .select(`
@@ -28,7 +28,7 @@ export default function CustomerOrders() {
           )
         `)
         .eq("customer_id", user?.id)
-        .order("created_at", { ascending);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -36,8 +36,8 @@ export default function CustomerOrders() {
   });
 
   const { data: invoices } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["order-invoices", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
         .select("invoice_number, sales(customer_orders(id))")
@@ -77,10 +77,10 @@ export default function CustomerOrders() {
   }
 
   return (
-    <div className="space-y-4 sm
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl sm
-        <p className="text-sm sm
+        <h1 className="text-2xl sm:text-3xl font-bold">My Orders</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">View your purchase history</p>
       </div>
 
       <Card>
@@ -103,12 +103,12 @@ export default function CustomerOrders() {
                 return (
                   <Card key={order.id}>
                     <CardHeader>
-                      <div className="flex flex-col sm
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div>
-                          <CardTitle className="text-base sm
+                          <CardTitle className="text-base sm:text-lg">
                             Order #{order.order_number}
                           </CardTitle>
-                          <CardDescription className="text-xs sm
+                          <CardDescription className="text-xs sm:text-sm">
                             {format(new Date(order.created_at), "MMM d, yyyy 'at' h:mm a")}
                           </CardDescription>
                         </div>
@@ -161,7 +161,9 @@ export default function CustomerOrders() {
                 );
               })}
             </div>
-          ){searchQuery ? "No orders found matching your search" : "No orders yet"}
+          ) : (
+            <p className="text-center text-muted-foreground py-8">
+              {searchQuery ? "No orders found matching your search" : "No orders yet"}
             </p>
           )}
         </CardContent>

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/uimain/button";
 import { ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
+
+
 
 export function AddToCartButton({
   productId,
@@ -20,7 +22,7 @@ export function AddToCartButton({
       return;
     }
 
-    addToCart({ productId, quantity);
+    addToCart({ productId, quantity: defaultQuantity });
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2000);
   };

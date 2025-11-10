@@ -1,6 +1,6 @@
 import { MetricCard } from "@/components/MetricCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
 import { 
   DollarSign, 
   ShoppingBag, 
@@ -18,9 +18,9 @@ export default function Dashboard() {
   const { products, isLoading: productsLoading } = useProducts();
 
   const recentSales = sales?.slice(0, 4).map((sale) => ({
-    id,
-    customer,
-    amount),
+    id: sale.id,
+    customer: sale.customers?.name || "Walk-in Customer",
+    amount: Number(sale.total_amount),
     items: sale.sale_items?.length || 0,
     time: new Date(sale.created_at).toLocaleString(),
   })) || [];
@@ -30,9 +30,9 @@ export default function Dashboard() {
     .sort((a, b) => b.stock_qty - a.stock_qty)
     .slice(0, 4)
     .map((p) => ({
-      name,
-      sales,
-      revenue) * p.stock_qty,
+      name: p.name,
+      sales: p.stock_qty,
+      revenue: Number(p.sale_price) * p.stock_qty,
     })) || [];
 
   if (analyticsLoading || salesLoading || productsLoading) {
@@ -44,15 +44,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 sm
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl sm
-        <p className="text-sm sm
-          Welcome back Here's what's happening with your business today.
+        <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Welcome back! Here's what's happening with your business today.
         </p>
       </div>
 
-      <div className="grid gap-3 sm
+      <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Total Revenue"
           value={`₦${analytics?.totalRevenue.toLocaleString() || "0"}`}
@@ -101,7 +101,7 @@ export default function Dashboard() {
               {recentSales.map((sale) => (
                 <div
                   key={sale.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover
+                  className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                 >
                   <div>
                     <p className="font-medium text-foreground">{sale.customer}</p>

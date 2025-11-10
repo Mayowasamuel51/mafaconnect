@@ -1,32 +1,34 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
 import { Loader2 } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
+
+
 
 export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
   const { createProduct } = useProducts();
   const [formData, setFormData] = React.useState({
-    name,
-    sku,
-    description,
-    cost_price,
-    sale_price,
-    stock_qty,
-    reorder_level,
+    name: "",
+    sku: "",
+    description: "",
+    cost_price: "",
+    sale_price: "",
+    stock_qty: "",
+    reorder_level: "50",
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     await createProduct.mutateAsync({
-      name,
-      sku,
-      description,
-      cost_price),
+      name: formData.name,
+      sku: formData.sku,
+      description: formData.description || null,
+      cost_price: parseFloat(formData.cost_price),
       sale_price: parseFloat(formData.sale_price),
       stock_qty: parseInt(formData.stock_qty),
       reorder_level: parseInt(formData.reorder_level),
@@ -34,20 +36,20 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
     });
 
     setFormData({
-      name,
-      sku,
-      description,
-      cost_price,
-      sale_price,
-      stock_qty,
-      reorder_level,
+      name: "",
+      sku: "",
+      description: "",
+      cost_price: "",
+      sale_price: "",
+      stock_qty: "",
+      reorder_level: "50",
     });
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
         </DialogHeader>
@@ -57,7 +59,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name)}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
           </div>
@@ -67,7 +69,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
             <Input
               id="sku"
               value={formData.sku}
-              onChange={(e) => setFormData({ ...formData, sku)}
+              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
               required
             />
           </div>
@@ -77,7 +79,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description)}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
 
@@ -89,7 +91,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 type="number"
                 step="0.01"
                 value={formData.cost_price}
-                onChange={(e) => setFormData({ ...formData, cost_price)}
+                onChange={(e) => setFormData({ ...formData, cost_price: e.target.value })}
                 required
               />
             </div>
@@ -101,7 +103,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 type="number"
                 step="0.01"
                 value={formData.sale_price}
-                onChange={(e) => setFormData({ ...formData, sale_price)}
+                onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
                 required
               />
             </div>
@@ -114,7 +116,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 id="stock_qty"
                 type="number"
                 value={formData.stock_qty}
-                onChange={(e) => setFormData({ ...formData, stock_qty)}
+                onChange={(e) => setFormData({ ...formData, stock_qty: e.target.value })}
                 required
               />
             </div>
@@ -125,7 +127,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 id="reorder_level"
                 type="number"
                 value={formData.reorder_level}
-                onChange={(e) => setFormData({ ...formData, reorder_level)}
+                onChange={(e) => setFormData({ ...formData, reorder_level: e.target.value })}
               />
             </div>
           </div>

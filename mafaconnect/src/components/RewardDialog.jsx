@@ -1,14 +1,16 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+
+
 
 export function RewardDialog({ open, onOpenChange }: RewardDialogProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -19,7 +21,7 @@ export function RewardDialog({ open, onOpenChange }: RewardDialogProps) {
   const [stockLimit, setStockLimit] = React.useState("");
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -27,16 +29,16 @@ export function RewardDialog({ open, onOpenChange }: RewardDialogProps) {
       const { error } = await supabase.from("rewards").insert({
         title,
         description,
-        points_cost),
+        points_cost: parseInt(pointsCost),
         reward_type: rewardType,
-        stock_limit: stockLimit ? parseInt(stockLimit) : null,
+        stock_limit: stockLimit ? parseInt(stockLimit) ,
         active: true,
       });
 
       if (error) throw error;
 
-      toast.success("Reward created successfully");
-      queryClient.invalidateQueries({ queryKey);
+      toast.success("Reward created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["rewards"] });
       
       setTitle("");
       setDescription("");
@@ -53,7 +55,7 @@ export function RewardDialog({ open, onOpenChange }: RewardDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Create New Reward</DialogTitle>
         </DialogHeader>

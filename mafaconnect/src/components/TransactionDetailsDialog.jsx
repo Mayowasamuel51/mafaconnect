@@ -5,16 +5,18 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
+import { Separator } from "@/components/uimain/separator";
 import { TRANSACTION_TYPES, STATUS_CONFIG, formatCurrency, isOverdue } from "@/lib/transactionUtils";
 
 import { useTransactions } from "@/hooks/useTransactions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+
+
 
 export function TransactionDetailsDialog({
   open,
@@ -31,8 +33,8 @@ export function TransactionDetailsDialog({
   const statusConfig = STATUS_CONFIG[transaction.status;
   const overdue = isOverdue(transaction.due_date, transaction.status);
 
-  const handleStatusChange = (newStatus) => {
-    updateTransactionStatus({ id, status);
+  const handleStatusChange = (newStatus: TransactionStatus) => {
+    updateTransactionStatus({ id: transaction.id, status: newStatus });
   };
 
   const downloadPDF = async () => {
@@ -45,7 +47,7 @@ export function TransactionDetailsDialog({
         .select("*")
         .in("setting_key", ["business_name", "business_address", "business_phone", "business_email"]);
 
-      const settings= {};
+      const settings = {};
       storeSettings?.forEach(s => {
         settings[s.setting_key] = s.setting_value;
       });
@@ -157,7 +159,7 @@ export function TransactionDetailsDialog({
           ` : ''}
 
           <div class="footer">
-            <p>Thank you for your business</p>
+            <p>Thank you for your business!</p>
             <p>Generated on ${format(new Date(), "MMMM do, yyyy 'at' h:mm a")}</p>
           </div>
         </body>
@@ -165,7 +167,7 @@ export function TransactionDetailsDialog({
       `;
 
       // Create blob and download
-      const blob = new Blob([transactionHTML], { type);
+      const blob = new Blob([transactionHTML], { type: 'text/html' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -175,9 +177,9 @@ export function TransactionDetailsDialog({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success("Transaction downloaded Open the file and print/save.");
+      toast.success("Transaction downloaded! Open the file and print/save");
     } catch (error) {
-      console.error("Error downloading transaction, error);
+      console.error("Error downloading transaction:", error);
       toast.error("Failed to download transaction");
     } finally {
       setIsDownloading(false);
@@ -194,8 +196,8 @@ export function TransactionDetailsDialog({
       }
 
       const { error } = await supabase.functions.invoke("send-receipt", {
-        body
-          saleId,
+        body: {
+          saleId: transaction.id,
         },
       });
 
@@ -203,7 +205,7 @@ export function TransactionDetailsDialog({
 
       toast.success(`Receipt sent to ${transaction.customers.email}`);
     } catch (error) {
-      console.error("Error sending email, error);
+      console.error("Error sending email:", error);
       toast.error("Failed to send receipt email");
     } finally {
       setIsSendingEmail(false);
@@ -313,7 +315,7 @@ export function TransactionDetailsDialog({
             </div>
             {transaction.discount_amount > 0 && (
               <div className="flex justify-between text-destructive">
-                <span>Discount
+                <span>Discount:</span>
                 <span>-{formatCurrency(transaction.discount_amount)}</span>
               </div>
             )}
@@ -361,14 +363,16 @@ export function TransactionDetailsDialog({
                 size="sm"
                 onClick={() => handleStatusChange("sent")}
               >
-                Mark/Button>
+                Mark
+              </Button>
             )}
             {transaction.status === "sent" && (
               <Button
                 size="sm"
                 onClick={() => handleStatusChange("paid")}
               >
-                Mark/Button>
+                Mark
+              </Button>
             )}
           </div>
         </div>

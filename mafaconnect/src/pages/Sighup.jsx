@@ -19,8 +19,8 @@ import { CardTitle } from "@/components/uisbefore/Card";
 import { CardDescription } from "@/components/uisbefore/Card";
 // import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/Tabs";
 import { Tabs,TabsList, TabsTrigger, TabsContent } from "@/components/uisbefore/Tabs";
-import { useTheme } from "@/hooks/useTheme";
-import { useToast } from "@/hooks/useToast";
+import { useTheme } from "@/hookss/useTheme";
+import { useToast } from "@/hookss/useToast";
 // import { useTheme } from "../hooks/useTheme";
 // import { useToast } from "../hooks/useToast";
 

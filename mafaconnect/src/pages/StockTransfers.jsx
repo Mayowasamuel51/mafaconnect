@@ -1,8 +1,8 @@
-import *"react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
 import { useStockTransfers } from "@/hooks/useStockTransfers";
 import { StockTransferDialog } from "@/components/StockTransferDialog";
 import { ArrowRight, ArrowRightLeft, Check, Clock, Package, X } from "lucide-react";
@@ -15,7 +15,7 @@ export default function StockTransfers() {
     useStockTransfers();
 
   const getStatusBadge = (status) => {
-    const variants; icon: any }> = {
+    const variants: Record<string, { variant; icon: any }> = {
       pending: { variant: "secondary", icon: Clock },
       approved: { variant: "default", icon: Check },
       in_transit: { variant: "default", icon: Package },
@@ -53,7 +53,7 @@ export default function StockTransfers() {
           <div>
             <h3 className="font-semibold text-lg mb-2">Error Loading Transfers</h3>
             <p className="text-muted-foreground text-sm mb-4">
-              {error instanceof Error ? error.message
+              {error instanceof Error ? error.message : "Failed to load stock transfers"}
             </p>
             <Button onClick={() => window.location.reload()} variant="outline">
               Retry
@@ -157,7 +157,8 @@ export default function StockTransfers() {
                       size="sm"
                       onClick={() => completeTransfer(transfer.id)}
                     >
-                      Mark/Button>
+                      Mark
+                    </Button>
                   )}
                 </div>
               </CardContent>
@@ -170,13 +171,14 @@ export default function StockTransfers() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">No Stock Transfers Yet</h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Before creating transfers, make sure you have
+                  Before creating transfers, make sure you have:
+                </p>
               </div>
               <div className="space-y-2 text-sm text-muted-foreground max-w-lg mx-auto">
                 <div className="flex items-start gap-2 text-left">
                   <span className="font-semibold text-foreground">1.</span>
                   <p>
-                    <strong className="text-foreground">Multiple Locations, stores, etc.)
+                    <strong className="text-foreground">Multiple Locations:</strong> Create at least 2 locations (warehouse, stores, etc.)
                     <Button 
                       variant="link" 
                       className="h-auto p-0 ml-1"

@@ -4,10 +4,10 @@ import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ConversationList } from "@/components/chat/ConversationList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { NewConversationDialog } from "@/components/chat/NewConversationDialog";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/uimain/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/uimain/tabs";
 import { Plus, Loader2, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hookss/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Messages() {
@@ -48,7 +48,8 @@ export default function Messages() {
     }
   }, [selectedConversationId, isMobile]);
 
-  // Mark(() => {
+  // Mark when conversation is selected
+  useEffect(() => {
     if (selectedConversationId) {
       markAsRead(selectedConversationId);
     }
@@ -58,9 +59,9 @@ export default function Messages() {
 
   const handleCreateConversation = (subject, message) => {
     createConversation(
-      { subject, initialMessage,
+      { subject, initialMessage: message },
       {
-        onSuccess) => {
+        onSuccess: (newConversation) => {
           setSelectedConversationId(newConversation.id);
           if (isMobile) {
             setShowChat(true);
@@ -83,7 +84,7 @@ export default function Messages() {
 
   const handleStatusChange = (status) => {
     if (selectedConversationId) {
-      updateConversationStatus({ conversationId, status });
+      updateConversationStatus({ conversationId: selectedConversationId, status });
     }
   };
 
@@ -114,13 +115,13 @@ export default function Messages() {
             {isStaff && (
               <Tabs value={statusFilter} onValueChange={setStatusFilter}>
                 <TabsList className="w-full grid grid-cols-3 h-10">
-                  <TabsTrigger value="all" className="text-xs sm
+                  <TabsTrigger value="all" className="text-xs sm:text-sm">
                     All
                   </TabsTrigger>
-                  <TabsTrigger value="open" className="text-xs sm
+                  <TabsTrigger value="open" className="text-xs sm:text-sm">
                     Open
                   </TabsTrigger>
-                  <TabsTrigger value="closed" className="text-xs sm
+                  <TabsTrigger value="closed" className="text-xs sm:text-sm">
                     Closed
                   </TabsTrigger>
                 </TabsList>
@@ -132,7 +133,7 @@ export default function Messages() {
             conversations={filteredConversations}
             selectedId={selectedConversationId}
             onSelect={handleSelectConversation}
-            onArchive={(id) => updateConversationStatus({ conversationId, status)}
+            onArchive={(id) => updateConversationStatus({ conversationId: id, status: "closed" })}
           />
         </div>
 
@@ -157,7 +158,7 @@ export default function Messages() {
           )}
           
           {selectedConversation && isStaff && !isMobile && (
-            <div className="p-2 sm
+            <div className="p-2 sm:p-3 border-b flex gap-2">
               <Button
                 size="sm"
                 variant={selectedConversation.status === "open" ? "default" : "outline"}

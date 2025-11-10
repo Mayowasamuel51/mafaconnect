@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
 import { OrderStatusTimeline } from "@/components/OrderStatusTimeline";
 import { formatCurrency } from "@/lib/transactionUtils";
 import { useCustomerOrders } from "@/hooks/useCustomerOrders";
 import { ArrowLeft } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/uimain/skeleton";
+import { Badge } from "@/components/uimain/Badge";
 
 export default function OrderTracking() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -22,7 +22,7 @@ export default function OrderTracking() {
           const data = await getOrderById(orderId);
           setOrder(data);
         } catch (error) {
-          console.error("Error fetching order, error);
+          console.error("Error fetching order:", error);
         } finally {
           setIsLoading(false);
         }
@@ -80,7 +80,7 @@ export default function OrderTracking() {
                     <div>
                       <p className="font-semibold">{item.product_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        Qty)}
+                        Qty: {item.quantity} × {formatCurrency(item.unit_price)}
                       </p>
                     </div>
                     <p className="font-semibold">{formatCurrency(item.line_total)}</p>

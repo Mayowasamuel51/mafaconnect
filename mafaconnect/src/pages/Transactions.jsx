@@ -1,17 +1,17 @@
 import { useState, useMemo } from "react";
 import { Plus, Search, Filter, ShieldAlert } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { useAuth } from "@/hookss/useAuth";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Card } from "@/components/uimain/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/uimain/select";
+import { Badge } from "@/components/uimain/Badge";
 import { useTransactions } from "@/hooks/useTransactions";
 import { TransactionDialog } from "@/components/TransactionDialog";
 import { TransactionDetailsDialog } from "@/components/TransactionDetailsDialog";
@@ -128,11 +128,13 @@ export default function Transactions() {
 
       {isLoading ? (
         <div className="text-center py-8">Loading transactions...</div>
-      ) : filteredTransactions.length === 0 ? (
+      )  = == 0 ? (
         <Card className="p-8 text-center">
           <p className="text-muted-foreground">No transactions found</p>
         </Card>
-      ){filteredTransactions.map((transaction) => {
+      ) : (
+        <div className="space-y-4">
+          {filteredTransactions.map((transaction) => {
             const typeConfig = TRANSACTION_TYPES[transaction.transaction_type;
             const statusConfig = STATUS_CONFIG[transaction.status;
             const overdue = isOverdue(transaction.due_date, transaction.status);
@@ -140,7 +142,7 @@ export default function Transactions() {
             return (
               <Card
                 key={transaction.id}
-                className="p-6 hover
+                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => handleViewDetails(transaction)}
               >
                 <div className="flex justify-between items-start">
@@ -156,14 +158,14 @@ export default function Transactions() {
                     </div>
                     <div className="flex gap-6 text-sm text-muted-foreground">
                       {transaction.customers && (
-                        <span>Customer
+                        <span>Customer: {transaction.customers.name}</span>
                       )}
                       {transaction.locations && (
-                        <span>Location
+                        <span>Location: {transaction.locations.name}</span>
                       )}
                       <span>Date: {format(new Date(transaction.created_at), "MMM dd, yyyy")}</span>
                       {transaction.due_date && (
-                        <span>Due), "MMM dd, yyyy")}</span>
+                        <span>Due: {format(new Date(transaction.due_date), "MMM dd, yyyy")}</span>
                       )}
                     </div>
                   </div>

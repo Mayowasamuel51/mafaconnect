@@ -1,9 +1,9 @@
-import *"react";
-import { useAuth } from "@/hooks/useAuth";
+import React from "react";
+import { useAuth } from "@/hookss/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
 import { Loader2, ShoppingBag, FileText, Gift, Award } from "lucide-react";
 import { format } from "date-fns";
 import { useKYCStatus } from "@/hooks/useKYC";
@@ -15,8 +15,8 @@ export default function CustomerDashboard() {
 
   // Fetch customer profile
   const { data: profile } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-profile", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -30,8 +30,8 @@ export default function CustomerDashboard() {
 
   // Fetch loyalty account
   const { data: loyaltyAccount } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-loyalty", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("loyalty_accounts")
         .select("*")
@@ -45,13 +45,13 @@ export default function CustomerDashboard() {
 
   // Fetch recent orders
   const { data: recentOrders, isLoading: loadingOrders } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-recent-orders", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("sales")
         .select("*")
         .eq("customer_id", user?.id)
-        .order("created_at", { ascending)
+        .order("created_at", { ascending: false })
         .limit(5);
       if (error) throw error;
       return data;
@@ -61,14 +61,14 @@ export default function CustomerDashboard() {
 
   // Fetch pending invoices
   const { data: pendingInvoices } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-pending-invoices", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
         .select("*")
         .eq("customer_id", user?.id)
         .in("status", ["draft", "sent"])
-        .order("created_at", { ascending);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -77,8 +77,8 @@ export default function CustomerDashboard() {
 
   // Calculate stats
   const { data: orderStats } = useQuery({
-    queryKey, user?.id],
-    queryFn) => {
+    queryKey: ["customer-order-stats", user?.id],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("sales")
         .select("total_amount, created_at")
@@ -114,10 +114,10 @@ export default function CustomerDashboard() {
   }
 
   return (
-    <div className="space-y-4 sm
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl sm, {profile?.full_name || "Customer"}!</h1>
-        <p className="text-sm sm
+        <h1 className="text-2xl sm:text-3xl font-bold">Welcome, {profile?.full_name || "Customer"}!</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Here's your account overview</p>
       </div>
 
       {kycStatus && (

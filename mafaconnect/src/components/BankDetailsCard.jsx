@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
 import { Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 ;
-  orderNumber: string;
+  orderNumber;
 }
 
 export function BankDetailsCard({ bankDetails, orderNumber }: BankDetailsCardProps) {
@@ -16,8 +16,8 @@ export function BankDetailsCard({ bankDetails, orderNumber }: BankDetailsCardPro
     navigator.clipboard.writeText(text);
     setCopied(field);
     toast({
-      title,
-      description,
+      title: "Copied to clipboard",
+      description: `${field} has been copied`,
     });
     setTimeout(() => setCopied(null), 2000);
   };
@@ -103,7 +103,7 @@ export function BankDetailsCard({ bankDetails, orderNumber }: BankDetailsCardPro
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Please use the order number.
+          Please use the order number transfer reference for faster processing.
         </p>
       </CardContent>
     </Card>

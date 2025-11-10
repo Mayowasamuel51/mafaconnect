@@ -1,7 +1,7 @@
-import React from "react";
+// import React from "react";
 // import { Toaster } from "./components/ui/Toaster";
 import Toaster from "@/components/ui/Toaster";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import { DashboardLayout } from "./components/DashboardLayout";
@@ -27,9 +27,9 @@ import { InstallPromptBanner } from "./components/InstallPromptBanner";
 // import Suppliers from "./pages/Suppliers";
 // import PurchaseOrders from "./pages/PurchaseOrders";
 // import StockTransfers from "./pages/StockTransfers";
-// import Admin from "./pages/Admin";
+import Admin from "./pages/Admin";
 import Auth from "./pages/Auth";
-import CustomerPortal from "./pages/CustomerPortal";
+// import CustomerPortal from "./pages/CustomerPortal";
 // import ProfileSettings from "./pages/ProfileSettings";
 // import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
@@ -42,6 +42,7 @@ import NotFound from "./pages/NotFound";
 // import CustomerOrderManagement from "./pages/CustomerOrderManagement";
 // import KYCOnboarding from "./pages/KYCOnboarding";
 import Install from "./pages/Install";
+import CustomerPortal from "./pages/CustomerPortal";
 
 const queryClient = new QueryClient();
 
@@ -330,8 +331,8 @@ function App() {
                 </DashboardLayout>
               </ProtectedRoute>
             }
-          />
-          <Route
+          /> */}
+          {/* <Route
             path="/admin"
             element={
               <ProtectedRoute requireAdmin>
@@ -361,7 +362,7 @@ export default App;
 // import CustomerPortal from "./pages/CustomerPortal";
 // // import DashboardLayout from "./components/layouts/DashboardLayout";
 // // import Admin from "./pages/Admin";
-// // import ProtectedRoute from "./components/ProtectedRoute";
+// import ProtectedRoute from "./components/ProtectedRoute";
 
 // const queryClient = new QueryClient();
 

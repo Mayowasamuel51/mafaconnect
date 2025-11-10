@@ -1,8 +1,8 @@
-import *"react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Badge } from "@/components/uimain/Badge";
 import { useReturns } from "@/hooks/useReturns";
 import { PackageX, Plus, Search } from "lucide-react";
 import { format } from "date-fns";
@@ -62,12 +62,16 @@ export default function Returns() {
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8">Loading returns...</div>
-            ){searchQuery ? "No returns found" : "No returns yet"}
+            )  = == 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchQuery ? "No returns found" : "No returns yet"}
               </div>
-            ){filteredReturns?.map((returnRecord) => (
+            ) : (
+              <div className="space-y-4">
+                {filteredReturns?.map((returnRecord) => (
                   <div
                     key={returnRecord.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <PackageX className="h-8 w-8 text-destructive" />
@@ -100,9 +104,9 @@ export default function Returns() {
                             size="sm"
                             onClick={() =>
                               processReturn({
-                                id,
-                                status,
-                                restock,
+                                id: returnRecord.id,
+                                status: "approved",
+                                restock: false,
                               })
                             }
                           >
@@ -113,9 +117,9 @@ export default function Returns() {
                             variant="destructive"
                             onClick={() =>
                               processReturn({
-                                id,
-                                status,
-                                restock,
+                                id: returnRecord.id,
+                                status: "rejected",
+                                restock: false,
                               })
                             }
                           >
@@ -129,9 +133,9 @@ export default function Returns() {
                           className="mt-2"
                           onClick={() =>
                             processReturn({
-                              id,
-                              status,
-                              restock,
+                              id: returnRecord.id,
+                              status: "completed",
+                              restock: true,
                             })
                           }
                         >

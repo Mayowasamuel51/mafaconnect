@@ -1,35 +1,37 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { useLocations } from "@/hooks/useLocations";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/uimain/switch";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+
+
 
 export function LocationDialog({ open, onOpenChange, location }: LocationDialogProps) {
   const { createLocation, updateLocation } = useLocations();
   const [formData, setFormData] = React.useState({
-    name,
-    address,
-    phone,
-    email,
-    state,
-    zone,
-    location_type,
-    capacity_sqft,
-    active,
-    manager_id,
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
+    state: "",
+    zone: "",
+    location_type: "warehouse",
+    capacity_sqft: "",
+    active: true,
+    manager_id: "",
   });
 
   const { data: managers } = useQuery({
-    queryKey,
-    queryFn) => {
+    queryKey: ["managers"],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
-        .select("user_id, profiles, full_name, email)")
+        .select("user_id, profiles:profiles!user_roles_user_id_fkey(id, full_name, email)")
         .in("role", ["admin", "manager"]);
       
       if (error) throw error;
@@ -40,29 +42,29 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
   React.useEffect(() => {
     if (location) {
       setFormData({
-        name,
-        address,
-        phone,
-        email,
-        state,
-        zone,
-        location_type,
-        capacity_sqft) || "",
+        name: location.name || "",
+        address: location.address || "",
+        phone: location.phone || "",
+        email: location.email || "",
+        state: location.state || "",
+        zone: location.zone || "",
+        location_type: location.location_type || "warehouse",
+        capacity_sqft: location.capacity_sqft?.toString() || "",
         active: location.active ?? true,
         manager_id: location.manager_id || "",
       });
     } else {
       setFormData({
-        name,
-        address,
-        phone,
-        email,
-        state,
-        zone,
-        location_type,
-        capacity_sqft,
-        active,
-        manager_id,
+        name: "",
+        address: "",
+        phone: "",
+        email: "",
+        state: "",
+        zone: "",
+        location_type: "warehouse",
+        capacity_sqft: "",
+        active: true,
+        manager_id: "",
       });
     }
   }, [location, open]);
@@ -79,16 +81,16 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
     "South East", "South South", "South West"
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const submitData = {
       ...formData,
-      capacity_sqft: formData.capacity_sqft ? Number(formData.capacity_sqft) : undefined,
+      capacity_sqft: formData.capacity_sqft ? Number(formData.capacity_sqft) ,
       manager_id: formData.manager_id || null,
     };
 
     if (location) {
-      updateLocation({ id, ...submitData });
+      updateLocation({ id: location.id, ...submitData });
     } else {
       createLocation(submitData);
     }
@@ -109,7 +111,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name)}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Main Store, Warehouse A, etc."
                 required
               />
@@ -119,7 +121,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Label htmlFor="location_type">Location Type *</Label>
               <Select
                 value={formData.location_type}
-                onValueChange={(value) => setFormData({ ...formData, location_type)}
+                onValueChange={(value) => setFormData({ ...formData, location_type: value })}
               >
                 <SelectTrigger id="location_type">
                   <SelectValue />
@@ -139,7 +141,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Label htmlFor="state">State *</Label>
               <Select
                 value={formData.state}
-                onValueChange={(value) => setFormData({ ...formData, state)}
+                onValueChange={(value) => setFormData({ ...formData, state: value })}
               >
                 <SelectTrigger id="state">
                   <SelectValue placeholder="Select state" />
@@ -156,7 +158,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Label htmlFor="zone">Zone *</Label>
               <Select
                 value={formData.zone}
-                onValueChange={(value) => setFormData({ ...formData, zone)}
+                onValueChange={(value) => setFormData({ ...formData, zone: value })}
               >
                 <SelectTrigger id="zone">
                   <SelectValue placeholder="Select zone" />
@@ -175,7 +177,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
             <Input
               id="address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address)}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               placeholder="123 Main St, City"
             />
           </div>
@@ -186,7 +188,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Input
                 id="phone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone)}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+234..."
               />
             </div>
@@ -197,7 +199,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email)}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="location@example.com"
               />
             </div>
@@ -209,7 +211,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               id="capacity"
               type="number"
               value={formData.capacity_sqft}
-              onChange={(e) => setFormData({ ...formData, capacity_sqft)}
+              onChange={(e) => setFormData({ ...formData, capacity_sqft: e.target.value })}
               placeholder="Storage capacity in square feet"
             />
           </div>
@@ -219,7 +221,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
               <Switch
                 id="active"
                 checked={formData.active}
-                onCheckedChange={(checked) => setFormData({ ...formData, active)}
+                onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
               />
               <Label htmlFor="active">Active</Label>
             </div>
@@ -229,7 +231,7 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
             <Label htmlFor="manager">Location Manager (Optional)</Label>
             <Select
               value={formData.manager_id}
-              onValueChange={(value) => setFormData({ ...formData, manager_id)}
+              onValueChange={(value) => setFormData({ ...formData, manager_id: value })}
             >
               <SelectTrigger id="manager">
                 <SelectValue placeholder="Select manager" />

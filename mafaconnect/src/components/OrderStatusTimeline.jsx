@@ -2,10 +2,12 @@ import { Check, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
+
+
 >;
 }
 
-const STATUS_FLOW; label: string }> = [
+const STATUS_FLOW: Array<{ status; label: string }> = [
   { status: "pending", label: "Pending" },
   { status: "confirmed", label: "Confirmed" },
   { status: "processing", label: "Processing" },

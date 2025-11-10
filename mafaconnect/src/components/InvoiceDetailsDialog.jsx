@@ -1,11 +1,13 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Badge } from "@/components/uimain/Badge";
+import { Separator } from "@/components/uimain/separator";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, Edit, Mail } from "lucide-react";
+
+
 
 export function InvoiceDetailsDialog({
   invoiceId,
@@ -14,8 +16,8 @@ export function InvoiceDetailsDialog({
   onEdit,
 }: InvoiceDetailsDialogProps) {
   const { data: invoice, isLoading } = useQuery({
-    queryKey, invoiceId],
-    queryFn) => {
+    queryKey: ["invoice", invoiceId],
+    queryFn: async () => {
       if (!invoiceId) return null;
       const { data, error } = await supabase
         .from("invoices")

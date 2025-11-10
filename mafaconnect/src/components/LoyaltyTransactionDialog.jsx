@@ -1,15 +1,17 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useCustomers } from "@/hooks/useCustomers";
+
+
 
 export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransactionDialogProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -20,7 +22,7 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
   const { customers } = useCustomers();
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -37,9 +39,9 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
 
       // Create transaction
       const { error: txError } = await supabase.from("loyalty_transactions").insert({
-        loyalty_account_id,
-        points,
-        type=== "earn" ? "manual_credit" : "manual_debit",
+        loyalty_account_id: loyaltyAccount.id,
+        points: actualPoints,
+        type = == "earn" ? "manual_credit" : "manual_debit",
         note,
       });
 
@@ -49,14 +51,14 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
       const newBalance = loyaltyAccount.points_balance + actualPoints;
       const { error: updateError } = await supabase
         .from("loyalty_accounts")
-        .update({ points_balance)
+        .update({ points_balance: newBalance })
         .eq("id", loyaltyAccount.id);
 
       if (updateError) throw updateError;
 
-      toast.success(`${type === "earn" ? "Points awarded" : "Points redeemed"} successfully`);
-      queryClient.invalidateQueries({ queryKey);
-      queryClient.invalidateQueries({ queryKey);
+      toast.success(`${type === "earn" ? "Points awarded" : "Points redeemed"} successfully!`);
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.invalidateQueries({ queryKey: ["loyalty-stats"] });
       
       setCustomerId("");
       setPoints("");
@@ -72,7 +74,7 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Loyalty Points Transaction</DialogTitle>
         </DialogHeader>

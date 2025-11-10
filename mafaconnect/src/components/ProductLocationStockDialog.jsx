@@ -1,16 +1,18 @@
-import *"react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Textarea } from "@/components/uimain/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { useProductLocations } from "@/hooks/useProductLocations";
 import { useLocations } from "@/hooks/useLocations";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+import { Card } from "@/components/uimain/card";
+import { Badge } from "@/components/uimain/Badge";
 import { Package, TrendingDown, TrendingUp } from "lucide-react";
+
+
 
 export function ProductLocationStockDialog({
   open,
@@ -35,16 +37,16 @@ export function ProductLocationStockDialog({
     (loc) => !productLocationStock?.some((stock) => stock.location?.id === loc.id)
   ) || [];
 
-  const handleAdjustment = (type) => {
+  const handleAdjustment = (type: 'add' | 'remove') => {
     if (!selectedLocationId || !adjustment) return;
 
     const adjustmentValue = type === 'add' ? parseInt(adjustment) : -parseInt(adjustment);
 
     adjustLocationStock({
-      productId,
-      locationId,
-      adjustment,
-      reason=== 'add' ? 'added' : 'removed'}`,
+      productId: product.id,
+      locationId: selectedLocationId,
+      adjustment: adjustmentValue,
+      reason: reason || `Stock ${type === 'add' ? 'added' : 'removed'}`,
     });
 
     setAdjustment("");
@@ -56,10 +58,10 @@ export function ProductLocationStockDialog({
     if (!newLocationId || initialStock < 0) return;
 
     updateProductLocationStock({
-      productId,
-      locationId,
-      stockQty,
-      reorderLevel,
+      productId: product.id,
+      locationId: newLocationId,
+      stockQty: initialStock,
+      reorderLevel: reorderLevel,
     });
 
     setNewLocationId("");
@@ -129,7 +131,7 @@ export function ProductLocationStockDialog({
                 <option value="">Choose a location...</option>
                 {productLocationStock?.map((pl) => (
                   <option key={pl.location?.id} value={pl.location?.id}>
-                    {pl.location?.name} - Current
+                    {pl.location?.name} - Current: {pl.stock_qty}
                   </option>
                 ))}
               </select>
@@ -182,7 +184,11 @@ export function ProductLocationStockDialog({
               <p>This product is already assigned to all locations.</p>
               <p className="text-sm mt-2">Create more locations to assign this product.</p>
             </div>
-          ){newLocationId} onValueChange={setNewLocationId}>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="new-location">Select Location</Label>
+                <Select value={newLocationId} onValueChange={setNewLocationId}>
                   <SelectTrigger id="new-location">
                     <SelectValue placeholder="Choose a location" />
                   </SelectTrigger>

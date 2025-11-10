@@ -1,6 +1,8 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
 import { useLocations } from "@/hooks/useLocations";
 import { MapPin } from "lucide-react";
+
+
 
 export function LocationSelector({
   value,

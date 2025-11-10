@@ -1,18 +1,20 @@
-import *"react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@/components/uimain/dialog";
+import { Button } from "@/components/uimain/button";
+import { Input } from "@/components/uimain/Input";
+import { Label } from "@/components/uimain/label";
+import { Checkbox } from "@/components/uimain/checkbox";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductLocations } from "@/hooks/useProductLocations";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/uimain/scroll-area";
 import { Package } from "lucide-react";
+
+
 
 export function BulkAddProductsDialog({
   open,
@@ -23,7 +25,7 @@ export function BulkAddProductsDialog({
   const { products } = useProducts();
   const { updateProductLocationStock } = useProductLocations();
   const [selectedProducts, setSelectedProducts] = React.useState<
-    Record<string, { selected: boolean; quantity: number; reorderLevel: number }>
+    Record<string, { selected; quantity; reorderLevel: number }>
   >({});
 
   // Filter out products already at this location
@@ -35,9 +37,9 @@ export function BulkAddProductsDialog({
     setSelectedProducts((prev) => ({
       ...prev,
       [productId]: {
-        selected,
-        quantity,
-        reorderLevel,
+        selected: !prev[productId]?.selected,
+        quantity: prev[productId]?.quantity || 0,
+        reorderLevel: prev[productId]?.reorderLevel || 10,
       },
     }));
   };
@@ -47,7 +49,7 @@ export function BulkAddProductsDialog({
       ...prev,
       [productId]: {
         ...prev[productId],
-        quantity= 0 ? quantity,
+        quantity = 0 ? quantity : 0,
       },
     }));
   };
@@ -57,7 +59,7 @@ export function BulkAddProductsDialog({
       ...prev,
       [productId]: {
         ...prev[productId],
-        reorderLevel= 0 ? level,
+        reorderLevel = 0 ? level : 0,
       },
     }));
   };
@@ -71,8 +73,8 @@ export function BulkAddProductsDialog({
       updateProductLocationStock({
         productId,
         locationId,
-        stockQty,
-        reorderLevel,
+        stockQty: data.quantity,
+        reorderLevel: data.reorderLevel,
       });
     });
 
@@ -94,7 +96,11 @@ export function BulkAddProductsDialog({
             <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>All products are already assigned to this location.</p>
           </div>
-        ){availableProducts.map((product) => (
+        ) : (
+          <>
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-4">
+                {availableProducts.map((product) => (
                   <div
                     key={product.id}
                     className="flex items-start gap-4 p-4 border rounded-lg"

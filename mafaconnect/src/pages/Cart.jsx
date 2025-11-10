@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/uimain/button";
+import { Card, CardContent } from "@/components/uimain/card";
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/transactionUtils";
 import { ShoppingCart, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
-import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
+import { SwipeToDelete } from "@/components/uimain/swipe-to-delete";
 
 export default function Cart() {
   const { cart, cartTotal, updateQuantity, removeFromCart } = useCart();
@@ -23,7 +23,7 @@ export default function Cart() {
   const handleQuantityChange = (itemId, currentQty, change) => {
     const newQty = currentQty + change;
     if (newQty > 0) {
-      updateQuantity({ itemId, quantity);
+      updateQuantity({ itemId, quantity: newQty });
     }
   };
 
@@ -46,17 +46,17 @@ export default function Cart() {
   }
 
   return (
-    <div className="space-y-4 sm
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 pb-24 sm:pb-6">
       <div>
-        <h1 className="text-2xl sm
-        <p className="text-sm sm
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Shopping Cart</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           {cart.items.length} item{cart.items.length !== 1 ? "s" : ""} in your cart
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cart Items */}
-        <div className="lg
+        <div className="lg:col-span-2 space-y-4">
           {cart.items.map((item) => (
             <SwipeToDelete
               key={item.id}
