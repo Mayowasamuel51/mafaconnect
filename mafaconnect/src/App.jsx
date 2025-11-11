@@ -42,6 +42,7 @@ import NotFound from "./pages/NotFound";
 import Install from "./pages/Install";
 import CustomerPortal from "./pages/CustomerPortal";
 import { DashboardLayout } from "./components/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -180,6 +181,16 @@ function App() {
             } */}
           {/* /> */}
 
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
           {/* Staff Routes */}
           {/* <Route
             path="/"
@@ -343,17 +354,17 @@ function App() {
           /> */}
 
           <Route
-  path="/admin"
-  element={
-    <ProtectedRoute requireAdmin>
-      <DashboardLayout>
-        <Admin />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin>
+                <DashboardLayout>
+                  <Admin />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-{/* <Route
+          {/* <Route
   path="/manager"
   element={
     <ProtectedRoute requireManager>
@@ -375,7 +386,7 @@ function App() {
   }
 /> */}
 
-{/* <Route
+          {/* <Route
   path="/portal"
   element={
     <ProtectedRoute>
@@ -396,21 +407,6 @@ function App() {
 export default App;
 
 // import { Toaster } from "./components/ui/Toaster";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import React from "react";
 // import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
@@ -433,7 +429,7 @@ export default App;
 //       <InstallPromptBanner />
 //       <Router>
 //         {/* ✅ Global components outside Routes */}
-        
+
 //         <Toaster />
 
 //         <Routes>
