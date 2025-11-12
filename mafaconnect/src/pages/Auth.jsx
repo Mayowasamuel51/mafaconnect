@@ -79,6 +79,8 @@ export default function Auth() {
     }
   };
 
+  console.log('hello')
+
   // ✅ SIGNUP
   const handleSignup = async (e) => {
     e.preventDefault();
