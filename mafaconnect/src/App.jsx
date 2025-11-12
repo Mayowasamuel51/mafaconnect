@@ -43,6 +43,8 @@ import Install from "./pages/Install";
 import CustomerPortal from "./pages/CustomerPortal";
 import { DashboardLayout } from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import { CustomerProtectedRoute } from "./components/CustomerProtectedRoute";
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -55,7 +57,16 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/portal" element={<CustomerPortal />} />
           <Route path="/install" element={<Install />} />
-
+ <Route
+            path="/customer-dashboard"
+            element={
+              <CustomerProtectedRoute>
+                <DashboardLayout>
+                  <CustomerDashboard />
+                </DashboardLayout>
+              </CustomerProtectedRoute>
+            }
+          />
           {/* Customer Routes */}
           {/* <Route
             path="/customer-dashboard"
