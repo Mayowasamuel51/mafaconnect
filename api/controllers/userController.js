@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "🎉 Account created successfully. Waiting for admin approval.",
+      message: "Account created successfully. Waiting for admin approval.",
       user: {
         id: user.id,
         name: user.name,

@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -6,7 +7,7 @@ const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
 const customer_bussiness=  require("./routes/customer_bussiness.js");
 dotenv.config();
-const app = express();
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -30,7 +31,8 @@ const PORT = process.env.PORT || 8000;
 (async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
+    // await sequelize.sync();
+    await sequelize.sync({ alter: true });
     console.log("✅ Connected to MySQL");
 
     app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
