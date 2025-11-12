@@ -7,7 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
+import { Button } from "@/components/ui/Button";
+
 import { Link } from "react-router-dom";
 // import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";
