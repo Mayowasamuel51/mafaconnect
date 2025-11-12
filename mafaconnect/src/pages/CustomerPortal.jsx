@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/uimain/card";
 import { Input } from "@/components/uimain/Input";
-import { Button } from "@/components/uimain/button";
+import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/uimain/Badge";
 import { Gift, Search, TrendingUp, Award } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
