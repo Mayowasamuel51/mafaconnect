@@ -19,7 +19,7 @@ export default function CustomerPortal() {
 
   // 🔹 1. Fetch customer info
   const { data: customer } = useQuery({
-    queryKey: ["customer", searchedPhone],
+    queryKey: ["user", searchedPhone],
     queryFn: async () => {
       if (!searchedPhone) return null;
       const response = await apiGet(`/api/customers?phone=${searchedPhone}`);
