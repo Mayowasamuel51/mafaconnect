@@ -1,32 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Minus, Plus, Trash2, X } from "lucide-react";
-<<<<<<< HEAD
-import { Button } from "@/components/uimain/button";
-=======
 import { Button } from "@/components/ui/Button";
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-<<<<<<< HEAD
-} from "@/components/uimain/sheet";
-import { Badge } from "@/components/uimain/Badge";
-import { useCart } from "@/hooks/useCart";
-import { formatCurrency } from "@/lib/transactionUtils";
-import { ScrollArea } from "@/components/uimain/scroll-area";
-import { SwipeToDelete } from "@/components/uimain/swipe-to-delete";
-=======
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/Badge";
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/transactionUtils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 export function ShoppingCartSidebar() {
   const [isOpen, setIsOpen] = useState(false);

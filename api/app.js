@@ -1,36 +1,20 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
-<<<<<<< HEAD
-// const cookieParser = require("cookie-parser");
-=======
-
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 const cors = require("cors");
 const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
 const customer_bussiness=  require("./routes/customer_bussiness.js");
 dotenv.config();
-<<<<<<< HEAD
-
-
 app.use(express.json());
-// app.use(cookieParser());
-=======
-app.use(express.json());
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 // ✅ Allow both localhost variants
 app.use(
   cors({
-<<<<<<< HEAD
-    origin: ["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:8080", "http://127.0.0.1:8080", ,"https://www.to-analytics.com"],
-=======
     origin: [
       
       // "http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:8080", "http://127.0.0.1:8080", ,"https://www.to-analytics.com",
        "https://mafaconnectfrontendv.vercel.app/auth", "https://mafaconnectfrontendv.vercel.app"],
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
     credentials: true,
   })
 );
@@ -39,11 +23,7 @@ app.use(
 app.use("/api/v1", adminRoutes);
 app.use("/api/v1", customer_bussiness);
 
-<<<<<<< HEAD
-app.get("/", (req, res) => res.send("🚀 MafaConnect Backend is running..."));
-=======
 app.get("/", (req, res) => res.send(" MafaConnect Backend is running..."));
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 const PORT = process.env.PORT || 8000;
 
@@ -54,15 +34,9 @@ const PORT = process.env.PORT || 8000;
     await sequelize.sync({ alter: true });
     console.log("✅ Connected to MySQL");
 
-<<<<<<< HEAD
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  } catch (err) {
-    console.error("❌ Failed to start server:", err);
-=======
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error(" Failed to start server:", err);
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
   }
 })();
 

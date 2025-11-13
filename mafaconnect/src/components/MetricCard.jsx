@@ -1,9 +1,5 @@
 import React from "react";
-<<<<<<< HEAD
-import { Card, CardContent } from "@/components/uimain/card";
-=======
 import { Card, CardContent } from "@/components/ui/Card";
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { cn } from "@/lib/utils";
 
 export function MetricCard({

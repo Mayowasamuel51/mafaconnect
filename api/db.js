@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-const { Sequelize } = require("sequelize");
-const dotenv = require("dotenv");
-
-dotenv.config();
-
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASS,
-  {
-    host: process.env.DB_HOST || "localhost",
-    dialect: "mysql",
-    logging: false,
-  }
-);
-=======
 
 const { Sequelize } = require("sequelize");
 const dotenv = require("dotenv");
@@ -46,6 +29,5 @@ sequelize.authenticate()
 //     logging: false,
 //   }
 // );
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 module.exports = { sequelize };
