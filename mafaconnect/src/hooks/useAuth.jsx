@@ -2,7 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const API_URL = import.meta.env.VITE_HOME_OO; // e.g. http://localhost:8000/api
+const API_URL ="https://mafaconnectbackendapi.onrender.com/api/v1"
+//  import.meta.env.VITE_HOME_OO; // e.g. http://localhost:8000/api
 
 // ✅ Fetch the current user
 async function fetchCurrentUser() {
