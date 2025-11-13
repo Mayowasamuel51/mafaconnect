@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
-const customer_bussiness=  require("./routes/customer_bussiness.js");
+const customer_bussiness = require("./routes/customer_bussiness.js");
 dotenv.config();
 app.use(express.json());
 
@@ -12,8 +12,13 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-       "https://mafaconnectfrontendv.vercel.app/auth", 
-       "https://mafaconnectfrontendv.vercel.app"],
+      "http://localhost:8081",
+      "https://mafaconnectfrontendv.vercel.app",
+      "http://127.0.0.1:8081",
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      "https://mafaconnectfrontendv.vercel.app/auth",
+    ],
     credentials: true,
   })
 );
