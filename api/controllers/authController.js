@@ -16,7 +16,7 @@ const generateAccessToken = (user) => {
       email: user.email,
     },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: "9h" }
+    { expiresIn: "1h" }
   );
 };
 
