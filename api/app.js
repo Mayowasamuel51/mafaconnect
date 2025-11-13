@@ -7,8 +7,6 @@ const { sequelize } = require("./db.js");
 const adminRoutes = require("./routes/admin");
 const customer_bussiness=  require("./routes/customer_bussiness.js");
 dotenv.config();
-
-
 app.use(express.json());
 
 // ✅ Allow both localhost variants
