@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useLoyaltyConfig } from "@/hooks/useLoyaltyConfig";
 import { Settings, Save } from "lucide-react";
