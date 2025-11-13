@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { apiPost } from "@/lib/api"; // ✅ using Node backend API instead of Supabase
 
 export default function Admin() {
+  console.log('...')
   const [isBackfilling, setIsBackfilling] = useState(false);
 
   // ✅ Replace Supabase function call with backend API
