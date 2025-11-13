@@ -70,10 +70,11 @@ export default function Auth() {
       }
     } catch (err) {
       toast({
-        title: "❌ Login failed",
+        title: "Login failed",
         description: err.response?.data?.message || err.message,
         variant: "destructive",
       });
+      console.log(err)
     } finally {
       setLoading(false);
     }
