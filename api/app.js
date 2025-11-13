@@ -12,7 +12,7 @@ app.use(express.json());
 // ✅ Allow both localhost variants
 app.use(
   cors({
-    origin: ["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:8080", "http://127.0.0.1:8080", ,"https://www.to-analytics.com"],
+    origin: ["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:8080", "http://127.0.0.1:8080", ,"https://www.to-analytics.com", "https://mafaconnectfrontendv.vercel.app/auth", "https://mafaconnectfrontendv.vercel.app"],
     credentials: true,
   })
 );
