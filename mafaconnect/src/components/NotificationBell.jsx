@@ -1,5 +1,5 @@
 import { Bell, Check } from "lucide-react";
-import { Button } from "@/components/uimain/button";
+import { Button } from "@/components/ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +7,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/uimain/dropdown-menu";
-import { Badge } from "@/components/uimain/Badge";
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/Badge";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
-import { ScrollArea } from "@/components/uimain/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 
 export function NotificationBell() {

@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Download, Upload, Database } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";

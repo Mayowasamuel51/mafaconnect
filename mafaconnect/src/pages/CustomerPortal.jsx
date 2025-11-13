@@ -1,12 +1,12 @@
 import React from "react";
-import { Card } from "@/components/uisbefore/Card";
-import { CardContent } from "@/components/uisbefore/Card";
-import { CardHeader } from "@/components/uisbefore/Card";
-import { CardTitle } from "@/components/uisbefore/Card";
-import { CardDescription } from "@/components/uisbefore/Card";
-import { Input } from "@/components/uimain/Input";
+import { Card } from "@/components/ui/Card";
+import { CardContent } from "@/components/ui/Card";
+import { CardHeader } from "@/components/ui/Card";
+import { CardTitle } from "@/components/ui/Card";
+import { CardDescription } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/uimain/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { Gift, Search, TrendingUp, Award } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api"; // <-- your Node API helper

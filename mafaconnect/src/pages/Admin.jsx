@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/uimain/card";
+} from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 import { Link } from "react-router-dom";

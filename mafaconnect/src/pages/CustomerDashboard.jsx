@@ -8,8 +8,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/uimain/card";
-import { Badge } from "@/components/uimain/Badge";
+} from "@/components/ui/Card";
+
+import { Badge } from "@/components/ui/Badge";
 import { Loader2, ShoppingBag, FileText, Gift, Award } from "lucide-react";
 import { format } from "date-fns";
 import { useKYCStatus } from "@/hooks/useKYC";

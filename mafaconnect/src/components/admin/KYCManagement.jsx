@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/uisbefore/Card";
-import { CardContent } from "@/components/uisbefore/Card";
-import { CardHeader } from "@/components/uisbefore/Card";
-import { CardTitle } from "@/components/uisbefore/Card";
-import { CardDescription } from "@/components/uisbefore/Card";
+import { Card } from "@/components/ui/Card";
+import { CardContent } from "@/components/ui/Card";
+import { CardHeader } from "@/components/ui/Card";
+import { CardTitle } from "@/components/ui/Card";
+import { CardDescription } from "@/components/ui/Card";
 import { Button } from "../ui/Button";
-import { Badge } from "@/components/uimain/Badge";
-import { Textarea } from "@/components/uimain/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/uimain/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/uimain/dialog";
+import { Badge } from "@/components/ui/Badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Loader2, CheckCircle, XCircle, Eye, User, Building2 } from "lucide-react";
 import { toast } from "sonner";
 

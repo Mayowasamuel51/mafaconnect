@@ -27,9 +27,9 @@ import {
   ArrowRightLeft,
   Receipt,
 } from "lucide-react";
-import { Button } from "@/components/uimain/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/uimain/sheet";
-import { Badge } from "@/components/uimain/Badge";
+import { Button } from "./ui/Button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/Badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { useTheme } from "@/hooks/useTheme";

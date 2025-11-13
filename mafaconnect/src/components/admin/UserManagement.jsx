@@ -1,9 +1,9 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/uimain/table";
-import { Badge } from "@/components/uimain/Badge";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useUsers } from "@/hooks/useUsers";
 import { Check, X, Shield, UserCog, Trash2, Search, Phone, Building2 } from "lucide-react";
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/uimain/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +22,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/uimain/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/uimain/select";
+} from "@/components/ui/select";
 
 export function UserManagement() {
   const { users, isLoading, updateUserApproval, assignRole, removeRole, deleteUser } = useUsers();
