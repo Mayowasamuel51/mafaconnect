@@ -1,10 +1,10 @@
 import { useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSales } from "@/hooks/useSales";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/uimain/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line } from "recharts";
 import { format, subDays, startOfDay } from "date-fns";
 import { ExportButton } from "@/components/ExportButton";
