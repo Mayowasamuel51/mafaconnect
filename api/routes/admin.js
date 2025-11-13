@@ -10,11 +10,7 @@ const {
 const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
 router.post("/login", adminLogin);
-<<<<<<< HEAD
-router.get("/auth/me", authenticate, requireRole("customer", "sales_person", "manager", "admin"), getCurrentUser);
-=======
 router.get("/auth/me", authenticate, requireRole("user", "sales_person", "manager", "admin"), getCurrentUser);
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 // router.get("/auth/me", authenticate, requireRole("user"), getCurrentUser);
 router.post("/refresh", refreshToken);
 router.post("/logout", logout);

@@ -9,13 +9,8 @@ require("dotenv").config();
     console.log("✅ Database connected...");
     await sequelize.sync({ alter: true });
     // Default admin credentials
-<<<<<<< HEAD
-    const account_number = "00000032";
-    const password = "22414";
-=======
     const account_number = "00000031";
     const password = "22413";
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Check if admin already exists
@@ -26,11 +21,7 @@ require("dotenv").config();
     } else {
       await User.create({
         name: "System Administrator",
-<<<<<<< HEAD
-         email: "admin@mafaconnect.com", 
-=======
          email: "adminnew@mafaconnect.com", 
->>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
         account_number,
         password: hashedPassword,
         role: "admin",
