@@ -32,9 +32,9 @@ const PORT = process.env.PORT || 8000;
     await sequelize.sync({ alter: true });
     console.log("✅ Connected to MySQL");
 
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
-    console.error("❌ Failed to start server:", err);
+    console.error(" Failed to start server:", err);
   }
 })();
 
