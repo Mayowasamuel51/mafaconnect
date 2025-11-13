@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
 import { Input } from "@/components/uimain/Input";
 import { Label } from "@/components/uimain/label";
 import { Button } from "@/components/uimain/button";
+=======
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useLoyaltyConfig } from "@/hooks/useLoyaltyConfig";
 import { Settings, Save } from "lucide-react";
 
@@ -130,6 +137,7 @@ export function SystemSettings() {
       </Card>
     </div>
   );
+<<<<<<< HEAD
 }
 
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
@@ -254,3 +262,6 @@ export function SystemSettings() {
 //     </div>
 //   );
 // }
+=======
+}
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

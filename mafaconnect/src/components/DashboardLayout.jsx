@@ -27,9 +27,15 @@ import {
   ArrowRightLeft,
   Receipt,
 } from "lucide-react";
+<<<<<<< HEAD
 import { Button } from "@/components/uimain/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/uimain/sheet";
 import { Badge } from "@/components/uimain/Badge";
+=======
+import { Button } from "./ui/Button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/Badge";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useAuth } from "@/hooks/useAuth";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { useTheme } from "@/hooks/useTheme";
@@ -37,7 +43,11 @@ import { useConversations } from "@/hooks/useConversations";
 import { LowStockAlert } from "./LowStockAlert";
 import { ShoppingCartSidebar } from "./ShoppingCartSidebar";
 import { NotificationBell } from "./NotificationBell";
+<<<<<<< HEAD
 // import { MobileBottomNav } from "./MobileBottomNav";
+=======
+
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 import MobileBottomNav from "./MobileBottomNav";
 
@@ -292,6 +302,7 @@ export function DashboardLayout({ children }) {
     </div>
   );
 }
+<<<<<<< HEAD
 
 // import React from "react";
 // import { Link, useLocation } from "react-router-dom";
@@ -603,3 +614,5 @@ export function DashboardLayout({ children }) {
 //     </div>
 //   );
 // }
+=======
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

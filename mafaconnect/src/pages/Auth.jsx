@@ -1,17 +1,33 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+=======
+
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/Label";
+import { Input } from "@/components/ui/Input";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+<<<<<<< HEAD
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+=======
+} from "@/components/ui/Card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/hooks/useTheme";
 import { Loader2, Moon, Sun } from "lucide-react";
@@ -76,6 +92,11 @@ export default function Auth() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  console.log('hello')
+
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
   // ✅ SIGNUP
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -370,6 +391,7 @@ export default function Auth() {
     </div>
   );
 }
+<<<<<<< HEAD
 
 
 // import React, { useState } from "react";
@@ -1055,3 +1077,5 @@ export default function Auth() {
 //     </div>
 //   );
 // }
+=======
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

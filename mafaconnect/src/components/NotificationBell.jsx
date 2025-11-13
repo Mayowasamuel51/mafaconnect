@@ -1,5 +1,9 @@
 import { Bell, Check } from "lucide-react";
+<<<<<<< HEAD
 import { Button } from "@/components/uimain/button";
+=======
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +11,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+<<<<<<< HEAD
 } from "@/components/uimain/dropdown-menu";
 import { Badge } from "@/components/uimain/Badge";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/uimain/scroll-area";
+=======
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/Badge";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useAuth } from "@/hooks/useAuth";
 
 export function NotificationBell() {

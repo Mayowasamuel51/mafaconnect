@@ -5,9 +5,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+<<<<<<< HEAD
 } from "@/components/uimain/card";
 import { Badge } from "@/components/uimain/Badge";
 import { Button } from "@/components/uimain/button";
+=======
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { Link } from "react-router-dom";
 import { Shield, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 
@@ -110,6 +116,7 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }) {
       </CardContent>
     </Card>
   );
+<<<<<<< HEAD
 }
 
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
@@ -209,3 +216,6 @@ export function KYCStatusCard({ kycStatus, customerType, kycNotes }) {
 //     </Card>
 //   );
 // }
+=======
+}
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

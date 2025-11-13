@@ -1,13 +1,23 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+=======
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+<<<<<<< HEAD
 } from "@/components/uimain/card";
 import { Button } from "@/components/uimain/button";
+=======
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { Link } from "react-router-dom";
 // import { UserManagement } from "@/components/admin/UserManagement";
 import { SystemSettings } from "@/components/admin/SystemSettings";

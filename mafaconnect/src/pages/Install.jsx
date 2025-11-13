@@ -68,6 +68,7 @@ function InstallPromptBanner() {
 }
 export default InstallPromptBanner;
 
+<<<<<<< HEAD
 // import React from "react";
 // import { useNavigate } from "react-router-dom";
 // import { Button } from "@/components/ui/button";
@@ -208,3 +209,5 @@ export default InstallPromptBanner;
 //     </div>
 //   );
 // }
+=======
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

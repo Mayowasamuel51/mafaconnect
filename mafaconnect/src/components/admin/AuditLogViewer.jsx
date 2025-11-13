@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/uimain/table";
 import { Badge } from "@/components/uimain/Badge";
+=======
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/Badge";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { FileText, Eye } from "lucide-react";
 import React from "react";
@@ -9,8 +15,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+<<<<<<< HEAD
 } from "@/components/uimain/dialog";
 import { Button } from "@/components/uimain/button";
+=======
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 export function AuditLogViewer() {
   const { logs, isLoading } = useAuditLogs();

@@ -3,6 +3,7 @@ import Toaster from "@/components/ui/Toaster";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+<<<<<<< HEAD
 // import { DashboardLayout } from "./components/DashboardLayout";
 import { InstallPromptBanner } from "./components/InstallPromptBanner";
 // import { CustomerProtectedRoute } from "./components/CustomerProtectedRoute";
@@ -39,6 +40,12 @@ import NotFound from "./pages/NotFound";
 // import OrderTracking from "./pages/OrderTracking";
 // import CustomerOrderManagement from "./pages/CustomerOrderManagement";
 // import KYCOnboarding from "./pages/KYCOnboarding";
+=======
+import { InstallPromptBanner } from "./components/InstallPromptBanner";
+import Admin from "./pages/Admin";
+import Auth from "./pages/Auth";
+import NotFound from "./pages/NotFound";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import Install from "./pages/Install";
 import CustomerPortal from "./pages/CustomerPortal";
 import { DashboardLayout } from "./components/DashboardLayout";
@@ -57,7 +64,11 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/portal" element={<CustomerPortal />} />
           <Route path="/install" element={<Install />} />
+<<<<<<< HEAD
  <Route
+=======
+          <Route
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
             path="/customer-dashboard"
             element={
               <CustomerProtectedRoute>

@@ -23,7 +23,11 @@ exports.register = async (req, res) => {
       phone,
       password: hashedPassword,
       customer_type,
+<<<<<<< HEAD
       role: role || "customer", // default
+=======
+      role: role || "user", // default
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
       kyc_status: "pending", // waiting for admin
       is_active: true,
     });

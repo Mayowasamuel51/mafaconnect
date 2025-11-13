@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { X, Download } from "lucide-react";
+<<<<<<< HEAD
 import { Button } from "@/components/uisbefore/Button";
 import { Card } from "@/components/uisbefore/Card";
+=======
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 export function InstallPromptBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);

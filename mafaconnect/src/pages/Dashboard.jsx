@@ -1,6 +1,17 @@
 import { MetricCard } from "@/components/MetricCard";
+<<<<<<< HEAD
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
 import { Button } from "@/components/uimain/button";
+=======
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { 
   DollarSign, 
   ShoppingBag, 

@@ -9,7 +9,11 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+<<<<<<< HEAD
 import { Badge } from "@/components/uimain/Badge";
+=======
+import { Badge } from "@/components/ui/Badge";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 export default function MobileBottomNav({ isStaff, unreadCount, onMoreClick }) {
   const location = useLocation();
@@ -73,6 +77,7 @@ export default function MobileBottomNav({ isStaff, unreadCount, onMoreClick }) {
     </nav>
   );
 }
+<<<<<<< HEAD
 
 // import { Link, useLocation } from "react-router-dom";
 // import { 
@@ -150,3 +155,5 @@ export default function MobileBottomNav({ isStaff, unreadCount, onMoreClick }) {
 //     </nav>
 //   );
 // }
+=======
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

@@ -1,9 +1,17 @@
 import React from "react";
+<<<<<<< HEAD
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/uimain/table";
 import { Badge } from "@/components/uimain/Badge";
 import { Button } from "@/components/uimain/button";
 import { Input } from "@/components/uimain/Input";
+=======
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { useUsers } from "@/hooks/useUsers";
 import { Check, X, Shield, UserCog, Trash2, Search, Phone, Building2 } from "lucide-react";
 import {
@@ -12,7 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+<<<<<<< HEAD
 } from "@/components/uimain/dropdown-menu";
+=======
+} from "@/components/ui/dropdown-menu";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,14 +34,22 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+<<<<<<< HEAD
 } from "@/components/uimain/alert-dialog";
+=======
+} from "@/components/ui/alert-dialog";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+<<<<<<< HEAD
 } from "@/components/uimain/select";
+=======
+} from "@/components/ui/select";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 export function UserManagement() {
   const { users, isLoading, updateUserApproval, assignRole, removeRole, deleteUser } = useUsers();

@@ -5,8 +5,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+<<<<<<< HEAD
 } from "@/components/uimain/card";
 import { Button } from "@/components/uimain/button";
+=======
+} from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { Download, Upload, Database } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";

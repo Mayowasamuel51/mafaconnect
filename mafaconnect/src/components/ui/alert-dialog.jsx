@@ -1,7 +1,11 @@
 import React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "@/lib/utils";
+<<<<<<< HEAD
 import { buttonVariants } from "@/components/uimain/button";
+=======
+import { buttonVariants } from "@/components/ui/Button";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 
 // 🔹 Base primitives
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -96,6 +100,7 @@ export {
   AlertDialogCancel,
 };
 
+<<<<<<< HEAD
 
 // import *"react";
 // import *"@radix-ui/react-alert-dialog";
@@ -201,3 +206,5 @@ export {
 //   AlertDialogAction,
 //   AlertDialogCancel,
 // };
+=======
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09

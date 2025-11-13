@@ -19,7 +19,11 @@ async function fetchCurrentUser() {
   }
 
   const data = await res.json();
+<<<<<<< HEAD
   console.log("✅ /me response:", data);
+=======
+  console.log("/me response:", data);
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
   return data;
 }
 

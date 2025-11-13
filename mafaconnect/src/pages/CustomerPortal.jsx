@@ -1,4 +1,5 @@
 import React from "react";
+<<<<<<< HEAD
 import {
   Card,
   CardContent,
@@ -9,6 +10,16 @@ import {
 import { Input } from "@/components/uimain/Input";
 import { Button } from "@/components/uimain/button";
 import { Badge } from "@/components/uimain/Badge";
+=======
+import { Card } from "@/components/ui/Card";
+import { CardContent } from "@/components/ui/Card";
+import { CardHeader } from "@/components/ui/Card";
+import { CardTitle } from "@/components/ui/Card";
+import { CardDescription } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
 import { Gift, Search, TrendingUp, Award } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api"; // <-- your Node API helper
@@ -21,7 +32,11 @@ export default function CustomerPortal() {
 
   // 🔹 1. Fetch customer info
   const { data: customer } = useQuery({
+<<<<<<< HEAD
     queryKey: ["customer", searchedPhone],
+=======
+    queryKey: ["user", searchedPhone],
+>>>>>>> 4646d22c81cd92c48b61aac62080ffd4d6e0dc09
     queryFn: async () => {
       if (!searchedPhone) return null;
       const response = await apiGet(`/api/customers?phone=${searchedPhone}`);
