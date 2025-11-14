@@ -1,14 +1,12 @@
 import { formatDistanceToNow } from "date-fns";
 
-
-
 export function MessageBubble({
   content,
   senderType,
   senderName,
   createdAt,
   isOwn,
-}: MessageBubbleProps) {
+}) {
   return (
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"} mb-4`}>
       <div
@@ -18,13 +16,22 @@ export function MessageBubble({
             : "bg-muted text-foreground"
         }`}
       >
+        {/* Sender name for messages NOT from current user */}
         {!isOwn && (
           <div className="text-xs font-medium mb-1 opacity-70">
             {senderName} ({senderType})
           </div>
         )}
-        <div className="text-sm whitespace-pre-wrap break-words">{content}</div>
-        <div className={`text-xs mt-1 ${isOwn ? "opacity-70" : "opacity-50"}`}>
+
+        {/* Message body */}
+        <div className="text-sm whitespace-pre-wrap break-words">
+          {content}
+        </div>
+
+        {/* Timestamp */}
+        <div
+          className={`text-xs mt-1 ${isOwn ? "opacity-70" : "opacity-50"}`}
+        >
           {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
         </div>
       </div>

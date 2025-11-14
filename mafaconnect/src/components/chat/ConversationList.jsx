@@ -1,10 +1,10 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/uimain/Badge";
-import { ScrollArea } from "@/components/uimain/scroll-area";
-import { useAuth } from "@/hookss/useAuth";
+import { Badge } from "@/components/ui/Badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/hooks/useAuth";
 import { MessageSquare, Archive } from "lucide-react";
-import { SwipeToDelete } from "@/components/uimain/swipe-to-delete";
+import { SwipeToDelete } from "@/components/ui/swipe-to-delete";
 import { toast } from "sonner";
 
 export function ConversationList({ conversations = [], selectedId, onSelect, onArchive }) {

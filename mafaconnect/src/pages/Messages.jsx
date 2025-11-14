@@ -4,10 +4,10 @@ import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { ConversationList } from "@/components/chat/ConversationList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { NewConversationDialog } from "@/components/chat/NewConversationDialog";
-import { Button } from "@/components/uimain/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+import { Button } from "@/components/ui/Button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Plus, Loader2, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hookss/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Messages() {

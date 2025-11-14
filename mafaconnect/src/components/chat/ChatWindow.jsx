@@ -1,30 +1,29 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { MessageBubble } from "./MessageBubble";
-import { Button } from "@/components/uimain/button";
-import { Textarea } from "@/components/uimain/textarea";
-import { Send, Loader2 } from "lucide-react";
-import { useAuth } from "@/hookss/useAuth";
+import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/textarea";
+import { Send, Loader2 } from "lucide-react"; 
+import { useAuth } from "@/hooks/useAuth";
 
-
-
-export function ChatWindow({ conversationId, conversationSubject, showHeader = true }: ChatWindowProps) {
-  const { user, isStaff } = useAuth();
+export function ChatWindow({ conversationId, conversationSubject, showHeader = true }) {
+  const { user } = useAuth();
   const { messages, isLoading, sendMessage, isSending } = useMessages(conversationId);
+
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = (e) => {
     e.preventDefault();
-    if (newMessage.trim() && conversationId) {
-      sendMessage({ content: newMessage });
-      setNewMessage("");
-    }
+    if (!newMessage.trim() || !conversationId) return;
+
+    sendMessage({ content: newMessage });
+    setNewMessage("");
   };
 
   if (!conversationId) {
@@ -45,10 +44,12 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header - Hidden on mobile when back button is shown */}
+      {/* Header */}
       {showHeader && (
         <div className="border-b p-3 sm:p-4">
-          <h2 className="font-semibold text-base sm:text-lg">{conversationSubject || "Conversation"}</h2>
+          <h2 className="font-semibold text-base sm:text-lg">
+            {conversationSubject || "Conversation"}
+          </h2>
         </div>
       )}
 
@@ -65,11 +66,17 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
                 key={message.id}
                 content={message.content}
                 senderType={message.sender_type}
-                senderName={message.sender?.full_name || message.sender?.email || "Unknown"}
+                senderName={
+                  message.sender?.full_name ||
+                  message.sender?.email ||
+                  "Unknown"
+                }
                 createdAt={message.created_at}
                 isOwn={message.sender_id === user?.id}
               />
             ))}
+
+            {/* Auto-scroll anchor */}
             <div ref={messagesEndRef} />
           </>
         )}
@@ -91,7 +98,13 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
               }
             }}
           />
-          <Button type="submit" disabled={!newMessage.trim() || isSending} size="icon" className="h-11 w-11">
+
+          <Button
+            type="submit"
+            disabled={!newMessage.trim() || isSending}
+            size="icon"
+            className="h-11 w-11"
+          >
             {isSending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -99,6 +112,7 @@ export function ChatWindow({ conversationId, conversationSubject, showHeader = t
             )}
           </Button>
         </div>
+
         <p className="text-xs text-muted-foreground mt-2 hidden sm:block">
           Press Enter to send, Shift+Enter for new line
         </p>

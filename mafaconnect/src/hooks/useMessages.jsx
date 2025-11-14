@@ -1,80 +1,59 @@
+// src/hooks/useMessages.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { apiGet, apiPost } from "@/lib/api";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
-import React from "react";
+import { useEffect } from "react";
 
-export function useMessages(conversationId: string | null) {
+export function useMessages(conversationId) {
   const { user, isStaff } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch messages for a conversation
-  const { data: messages, isLoading } = useQuery({
+  // FETCH MESSAGES FROM BACKEND
+  const {
+    data: messages,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["messages", conversationId],
     queryFn: async () => {
       if (!conversationId) return [];
 
-      const { data, error } = await supabase
-        .from("messages")
-        .select(`
-          *,
-          sender:profiles!messages_sender_id_fkey(full_name, email)
-        `)
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      return data;
+      const res = await apiGet(`/messages/${conversationId}`);
+      return res.data; // backend returns array of messages
     },
     enabled: !!conversationId && !!user,
   });
 
-  // Subscribe to real-time message updates
-  React.useEffect(() => {
+  // SIMPLE POLLING (REALT IME REPLACEMENT)
+  useEffect(() => {
     if (!conversationId || !user) return;
 
-    const channel = supabase
-      .channel(`messages-${conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-          queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
-      )
-      .subscribe();
+    const interval = setInterval(() => {
+      refetch(); // refresh messages every 3 seconds
+      queryClient.invalidateQueries(["conversations"]);
+    }, 3000);
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [conversationId, user, queryClient]);
+    return () => clearInterval(interval);
+  }, [conversationId, user]);
 
-  // Send new message
+  // SEND MESSAGE
   const sendMessage = useMutation({
-    mutationFn: async ({ content }: { content: string }) => {
+    mutationFn: async ({ content }) => {
       if (!conversationId) throw new Error("No conversation selected");
 
-      const { error } = await supabase.from("messages").insert({
+      await apiPost("/messages", {
         conversation_id: conversationId,
         sender_id: user?.id,
         sender_type: isStaff ? "staff" : "customer",
         content,
       });
-
-      if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries(["messages", conversationId]);
+      queryClient.invalidateQueries(["conversations"]);
     },
-    onError: (error) => {
-      console.error("Error sending message:", error);
+    onError: () => {
       toast.error("Failed to send message");
     },
   });

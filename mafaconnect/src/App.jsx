@@ -28,6 +28,7 @@ import Locations from "./pages/Locations";
 import LocationDetail from "./pages/LocationDetail";
 import Suppliers from "./pages/Suppliers";
 import PurchaseOrders from "./pages/PurchaseOrders";
+import Messages from "./pages/Messages";
 
 const queryClient = new QueryClient();
 
@@ -174,6 +175,16 @@ function App() {
               </AuthProtectedRoute>
             } */}
           {/* /> */}
+
+           <Route
+            path="/messages"
+            element={
+              <AuthProtectedRoute>
+                <DashboardLayout>
+                  <Messages />
+                </DashboardLayout>
+              </AuthProtectedRoute>
+            } />
 
           <Route
             path="/"

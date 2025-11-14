@@ -1,26 +1,25 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Textarea } from "@/components/uimain/textarea";
-import { Label } from "@/components/uimain/label";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/Label";
 
-
-
-export function NewConversationDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-}: NewConversationDialogProps) {
+export function NewConversationDialog({ open, onOpenChange, onSubmit }) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
     if (subject.trim() && message.trim()) {
       onSubmit(subject, message);
+
+      // Reset fields
       setSubject("");
       setMessage("");
+
+      // Close the modal
       onOpenChange(false);
     }
   };
@@ -31,7 +30,9 @@ export function NewConversationDialog({
         <DialogHeader>
           <DialogTitle>Start New Conversation</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Subject */}
           <div className="space-y-2">
             <Label htmlFor="subject">Subject</Label>
             <Input
@@ -42,6 +43,8 @@ export function NewConversationDialog({
               required
             />
           </div>
+
+          {/* Message */}
           <div className="space-y-2">
             <Label htmlFor="message">Message</Label>
             <Textarea
@@ -53,10 +56,13 @@ export function NewConversationDialog({
               required
             />
           </div>
+
+          {/* Buttons */}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
+
             <Button type="submit">Send</Button>
           </div>
         </form>
