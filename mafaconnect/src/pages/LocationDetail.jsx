@@ -1,121 +1,91 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
-import { Badge } from "@/components/uimain/Badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/uimain/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { useLocations } from "@/hooks/useLocations";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { 
-  ArrowLeft, 
-  Edit, 
-  MapPin, 
-  Warehouse, 
-  Package, 
-  TrendingUp, 
+import {
+  ArrowLeft,
+  Edit,
+  MapPin,
+  Warehouse,
+  Package,
+  TrendingUp,
   ArrowRightLeft,
   ShoppingCart,
-  User
+  User,
 } from "lucide-react";
 import { LocationDialog } from "@/components/LocationDialog";
 import { BulkAddProductsDialog } from "@/components/BulkAddProductsDialog";
-import { useAuth } from "@/hookss/useAuth";
+import { useAuth } from "@/hooks/useAuth";
+
+const API_BASE = import.meta.env.VITE_HOME_OO || "http://localhost:8000";
 
 export default function LocationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { locations } = useLocations();
   const { hasRole } = useAuth();
+
   const [showEditDialog, setShowEditDialog] = React.useState(false);
   const [showAddProductsDialog, setShowAddProductsDialog] = React.useState(false);
 
-  const location = locations?.find((loc) => loc.id === id);
+  const location = locations?.find((loc) => String(loc.id) === String(id));
 
+  // 📊 Location stats
   const { data: locationStats } = useQuery({
     queryKey: ["location-detail-stats", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc("get_location_stock_summary");
-      
-      if (error) throw error;
-      return data?.find((stat) => stat.location_id === id);
+      const res = await fetch(`${API_BASE}/locations/${id}/stats`);
+      if (!res.ok) throw new Error("Failed to fetch location stats");
+      return res.json();
     },
     enabled: !!id,
   });
 
+  // 🧾 Recent sales (last 30 days)
   const { data: recentSales } = useQuery({
     queryKey: ["location-recent-sales", id],
     queryFn: async () => {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const { data, error } = await supabase
-        .from("sales")
-        .select("id, created_at, total_amount, status")
-        .eq("location_id", id)
-        .gte("created_at", thirtyDaysAgo.toISOString())
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_BASE}/locations/${id}/sales?days=30`);
+      if (!res.ok) throw new Error("Failed to fetch recent sales");
+      return res.json();
     },
     enabled: !!id,
   });
 
+  // 🔁 Active transfers
   const { data: activeTransfers } = useQuery({
     queryKey: ["location-active-transfers", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("stock_movements")
-        .select(`
-          *,
-          product:products(name, sku),
-          from_location:locations!stock_movements_from_location_id_fkey(name),
-          to_location:locations!stock_movements_to_location_id_fkey(name)
-        `)
-        .or(`from_location_id.eq.${id},to_location_id.eq.${id}`)
-        .in("status", ["pending", "in_transit"])
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_BASE}/locations/${id}/transfers`);
+      if (!res.ok) throw new Error("Failed to fetch active transfers");
+      return res.json();
     },
     enabled: !!id,
   });
 
+  // 📦 Product stock at this location
   const { data: productStock } = useQuery({
     queryKey: ["location-product-stock", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("product_locations")
-        .select(`
-          *,
-          product:products(name, sku, sale_price)
-        `)
-        .eq("location_id", id)
-        .order("stock_qty", { ascending: false });
-      
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_BASE}/locations/${id}/stock`);
+      if (!res.ok) throw new Error("Failed to fetch product stock");
+      return res.json();
     },
     enabled: !!id,
   });
 
+  // 👤 Location manager
   const { data: manager } = useQuery({
     queryKey: ["location-manager", location?.manager_id],
     queryFn: async () => {
       if (!location?.manager_id) return null;
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name, email, phone")
-        .eq("id", location.manager_id)
-        .single();
-      
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_BASE}/users/${location.manager_id}`);
+      if (!res.ok) throw new Error("Failed to fetch manager");
+      return res.json();
     },
     enabled: !!location?.manager_id,
   });
@@ -132,7 +102,7 @@ export default function LocationDetail() {
     );
   }
 
-  const getLocationTypeBadge = (type?) => {
+  const getLocationTypeBadge = (type) => {
     const colors = {
       warehouse: "bg-blue-500/10 text-blue-500",
       depot: "bg-green-500/10 text-green-500",
@@ -144,6 +114,7 @@ export default function LocationDetail() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate("/locations")}>
@@ -175,6 +146,7 @@ export default function LocationDetail() {
             </div>
           </div>
         </div>
+
         {(hasRole("admin") || hasRole("manager")) && (
           <Button onClick={() => setShowEditDialog(true)}>
             <Edit className="mr-2 h-4 w-4" />
@@ -183,13 +155,16 @@ export default function LocationDetail() {
         )}
       </div>
 
+      {/* Top stats cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <Package className="h-8 w-8 text-primary" />
               <div className="text-right">
-                <p className="text-2xl font-bold">{locationStats?.total_products || 0}</p>
+                <p className="text-2xl font-bold">
+                  {locationStats?.total_products || 0}
+                </p>
                 <p className="text-xs text-muted-foreground">Products</p>
               </div>
             </div>
@@ -201,7 +176,10 @@ export default function LocationDetail() {
             <div className="flex items-center justify-between">
               <TrendingUp className="h-8 w-8 text-green-500" />
               <div className="text-right">
-                <p className="text-2xl font-bold">₦{Number(locationStats?.total_stock_value || 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  ₦
+                  {Number(locationStats?.total_stock_value || 0).toLocaleString()}
+                </p>
                 <p className="text-xs text-muted-foreground">Stock Value</p>
               </div>
             </div>
@@ -225,7 +203,9 @@ export default function LocationDetail() {
             <div className="flex items-center justify-between">
               <ArrowRightLeft className="h-8 w-8 text-orange-500" />
               <div className="text-right">
-                <p className="text-2xl font-bold">{activeTransfers?.length || 0}</p>
+                <p className="text-2xl font-bold">
+                  {activeTransfers?.length || 0}
+                </p>
                 <p className="text-xs text-muted-foreground">Active Transfers</p>
               </div>
             </div>
@@ -233,6 +213,7 @@ export default function LocationDetail() {
         </Card>
       </div>
 
+      {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -241,6 +222,7 @@ export default function LocationDetail() {
           <TabsTrigger value="transfers">Transfers</TabsTrigger>
         </TabsList>
 
+        {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           <Card>
             <CardHeader>
@@ -263,7 +245,9 @@ export default function LocationDetail() {
                 <div>
                   <p className="text-sm text-muted-foreground">Capacity</p>
                   <p className="font-medium">
-                    {location.capacity_sqft ? `${Number(location.capacity_sqft).toLocaleString()} sq ft` : "N/A"}
+                    {location.capacity_sqft
+                      ? `${Number(location.capacity_sqft).toLocaleString()} sq ft`
+                      : "N/A"}
                   </p>
                 </div>
               </div>
@@ -282,7 +266,9 @@ export default function LocationDetail() {
                 <div className="space-y-2">
                   <p className="font-medium">{manager.full_name}</p>
                   <p className="text-sm text-muted-foreground">{manager.email}</p>
-                  {manager.phone && <p className="text-sm text-muted-foreground">{manager.phone}</p>}
+                  {manager.phone && (
+                    <p className="text-sm text-muted-foreground">{manager.phone}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -294,12 +280,16 @@ export default function LocationDetail() {
                 <CardTitle className="text-destructive">Low Stock Alert</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{locationStats.low_stock_items} products are below reorder level at this location</p>
+                <p>
+                  {locationStats.low_stock_items} products are below reorder level
+                  at this location
+                </p>
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
+        {/* Stock Tab */}
         <TabsContent value="stock">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -317,13 +307,18 @@ export default function LocationDetail() {
                   <div className="text-center py-12 space-y-3">
                     <Package className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
                     <div>
-                      <p className="text-muted-foreground font-medium">No products at this location</p>
+                      <p className="text-muted-foreground font-medium">
+                        No products at this location
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         Add products to start tracking inventory here
                       </p>
                     </div>
                     {(hasRole("admin") || hasRole("manager")) && (
-                      <Button onClick={() => setShowAddProductsDialog(true)} className="mt-4">
+                      <Button
+                        onClick={() => setShowAddProductsDialog(true)}
+                        className="mt-4"
+                      >
                         <Package className="mr-2 h-4 w-4" />
                         Add Products
                       </Button>
@@ -331,15 +326,24 @@ export default function LocationDetail() {
                   </div>
                 ) : (
                   productStock?.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div>
-                        <p className="font-medium">{item.product.name}</p>
-                        <p className="text-sm text-muted-foreground">SKU: {item.product.sku}</p>
+                        <p className="font-medium">{item.product?.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          SKU: {item.product?.sku}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{item.stock_qty} units</p>
+                        <p className="font-semibold">
+                          {item.stock_qty} units
+                        </p>
                         {item.stock_qty <= item.reorder_level && (
-                          <Badge variant="destructive" className="text-xs">Low Stock</Badge>
+                          <Badge variant="destructive" className="text-xs">
+                            Low Stock
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -350,6 +354,7 @@ export default function LocationDetail() {
           </Card>
         </TabsContent>
 
+        {/* Sales Tab */}
         <TabsContent value="sales">
           <Card>
             <CardHeader>
@@ -358,17 +363,24 @@ export default function LocationDetail() {
             <CardContent>
               <div className="space-y-3">
                 {recentSales?.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No recent sales</p>
+                  <p className="text-center text-muted-foreground py-8">
+                    No recent sales
+                  </p>
                 ) : (
                   recentSales?.map((sale) => (
-                    <div key={sale.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div
+                      key={sale.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div>
                         <p className="text-sm text-muted-foreground">
                           {new Date(sale.created_at).toLocaleDateString()}
                         </p>
                         <Badge variant="outline">{sale.status}</Badge>
                       </div>
-                      <p className="font-semibold">₦{Number(sale.total_amount).toLocaleString()}</p>
+                      <p className="font-semibold">
+                        ₦{Number(sale.total_amount).toLocaleString()}
+                      </p>
                     </div>
                   ))
                 )}
@@ -377,6 +389,7 @@ export default function LocationDetail() {
           </Card>
         </TabsContent>
 
+        {/* Transfers Tab */}
         <TabsContent value="transfers">
           <Card>
             <CardHeader>
@@ -385,10 +398,15 @@ export default function LocationDetail() {
             <CardContent>
               <div className="space-y-3">
                 {activeTransfers?.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No active transfers</p>
+                  <p className="text-center text-muted-foreground py-8">
+                    No active transfers
+                  </p>
                 ) : (
                   activeTransfers?.map((transfer) => (
-                    <div key={transfer.id} className="p-3 border rounded-lg space-y-2">
+                    <div
+                      key={transfer.id}
+                      className="p-3 border rounded-lg space-y-2"
+                    >
                       <div className="flex items-center justify-between">
                         <p className="font-medium">{transfer.product?.name}</p>
                         <Badge>{transfer.status}</Badge>
@@ -407,12 +425,14 @@ export default function LocationDetail() {
         </TabsContent>
       </Tabs>
 
-      <LocationDialog 
-        open={showEditDialog} 
+      {/* Edit Location Dialog */}
+      <LocationDialog
+        open={showEditDialog}
         onOpenChange={setShowEditDialog}
         location={location}
       />
 
+      {/* Bulk Add Products Dialog */}
       <BulkAddProductsDialog
         open={showAddProductsDialog}
         onOpenChange={setShowAddProductsDialog}

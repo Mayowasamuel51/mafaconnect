@@ -1,87 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export function useReturns() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // ----------------------------------------------------
+  // FETCH RETURNS
+  // ----------------------------------------------------
   const { data: returns, isLoading } = useQuery({
     queryKey: ["returns"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("returns")
-        .select(`
-          *,
-          customers(*),
-          sales(*)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/api/returns`);
+      if (!res.ok) throw new Error("Failed to load returns");
+      return res.json();
     },
   });
 
+  // ----------------------------------------------------
+  // CREATE RETURN
+  // ----------------------------------------------------
   const createReturn = useMutation({
-    mutationFn: async (returnData: {
-      saleId;
-      customerId?;
-      reason;
-      items: Array<{
-        productId;
-        quantity;
-        unitPrice;
-        condition;
-      }>;
-      refundMethod;
-      notes?;
-    }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
+    mutationFn: async (returnData) => {
       const refundAmount = returnData.items.reduce(
         (sum, item) => sum + item.quantity * item.unitPrice,
         0
       );
 
-      const returnNumber = `RET-${Date.now()}`;
+      const payload = {
+        return_number: `RET-${Date.now()}`,
+        sale_id: returnData.saleId,
+        customer_id: returnData.customerId || null,
+        reason: returnData.reason,
+        items: returnData.items,
+        refund_amount: refundAmount,
+        refund_method: returnData.refundMethod,
+        notes: returnData.notes || "",
+      };
 
-      const { data: returnRecord, error: returnError } = await supabase
-        .from("returns")
-        .insert({
-          return_number: returnNumber,
-          sale_id: returnData.saleId,
-          customer_id: returnData.customerId,
-          reason: returnData.reason,
-          refund_amount: refundAmount,
-          refund_method: returnData.refundMethod,
-          notes: returnData.notes,
-          processed_by: user.id,
-          status: "pending",
-        })
-        .select()
-        .single();
+      const res = await fetch(`${API_URL}/api/returns`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-      if (returnError) throw returnError;
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: "Error" }));
+        throw new Error(error.message || "Failed to create return");
+      }
 
-      const returnItems = returnData.items.map((item) => ({
-        return_id: returnRecord.id,
-        product_id: item.productId,
-        quantity: item.quantity,
-        unit_price: item.unitPrice,
-        line_total: item.quantity * item.unitPrice,
-        condition: item.condition,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("return_items")
-        .insert(returnItems);
-
-      if (itemsError) throw itemsError;
-
-      return returnRecord;
+      return res.json();
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["returns"] });
       toast({
@@ -89,7 +61,8 @@ export function useReturns() {
         description: "Return created successfully",
       });
     },
-    onError: (error: Error) => {
+
+    onError: (error) => {
       toast({
         title: "Error",
         description: error.message,
@@ -98,51 +71,28 @@ export function useReturns() {
     },
   });
 
+  // ----------------------------------------------------
+  // PROCESS RETURN (approve, reject, complete, restock)
+  // ----------------------------------------------------
   const processReturn = useMutation({
-    mutationFn: async ({
-      id,
-      status,
-      restock,
-    }: {
-      id;
-      status;
-      restock;
-    }) => {
-      const { data: returnRecord, error: fetchError } = await supabase
-        .from("returns")
-        .select("*, return_items(*)")
-        .eq("id", id)
-        .single();
+    mutationFn: async ({ id, status, restock }) => {
+      const res = await fetch(`${API_URL}/api/returns/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, restock }),
+      });
 
-      if (fetchError) throw fetchError;
-
-      if (restock && status === "completed") {
-        for (const item of returnRecord.return_items) {
-          const { data: product } = await supabase
-            .from("products")
-            .select("stock_qty")
-            .eq("id", item.product_id)
-            .single();
-
-          if (product) {
-            await supabase
-              .from("products")
-              .update({ stock_qty: product.stock_qty + item.quantity })
-              .eq("id", item.product_id);
-          }
-        }
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: "Error" }));
+        throw new Error(error.message || "Failed to process return");
       }
 
-      const { error } = await supabase
-        .from("returns")
-        .update({ status, restocked: restock })
-        .eq("id", id);
-
-      if (error) throw error;
+      return res.json();
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["returns"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] }); // restock
       toast({
         title: "Success",
         description: "Return processed successfully",
@@ -150,5 +100,10 @@ export function useReturns() {
     },
   });
 
-  return { returns, isLoading, createReturn: createReturn.mutate, processReturn: processReturn.mutate };
+  return {
+    returns,
+    isLoading,
+    createReturn: createReturn.mutate,
+    processReturn: processReturn.mutate,
+  };
 }

@@ -1,18 +1,18 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useLocations } from "@/hooks/useLocations";
-import { Switch } from "@/components/uimain/switch";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
+const API_BASE = import.meta.env.VITE_HOME_OO || "http://localhost:8000";
 
-
-export function LocationDialog({ open, onOpenChange, location }: LocationDialogProps) {
+export function LocationDialog({ open, onOpenChange, location }) {
   const { createLocation, updateLocation } = useLocations();
+
   const [formData, setFormData] = React.useState({
     name: "",
     address: "",
@@ -26,19 +26,17 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
     manager_id: "",
   });
 
+  // ✅ Fetch managers from REST API instead of Supabase
   const { data: managers } = useQuery({
     queryKey: ["managers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("user_id, profiles:profiles!user_roles_user_id_fkey(id, full_name, email)")
-        .in("role", ["admin", "manager"]);
-      
-      if (error) throw error;
-      return data.map(r => r.profiles).filter(Boolean);
+      const res = await fetch(`${API_BASE}/users/managers`);
+      if (!res.ok) throw new Error("Failed to fetch managers");
+      return res.json();
     },
   });
 
+  // Load existing location into form
   React.useEffect(() => {
     if (location) {
       setFormData({
@@ -71,29 +69,32 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
 
   const nigerianStates = [
     "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
-    "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo",
-    "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa",
-    "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
+    "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe",
+    "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
+    "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau",
+    "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
   ];
 
   const zones = [
-    "North Central", "North East", "North West", 
+    "North Central", "North East", "North West",
     "South East", "South South", "South West"
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+
     const submitData = {
       ...formData,
-      capacity_sqft: formData.capacity_sqft ? Number(formData.capacity_sqft) ,
+      capacity_sqft: formData.capacity_sqft ? Number(formData.capacity_sqft) : null,
       manager_id: formData.manager_id || null,
     };
 
     if (location) {
-      updateLocation({ id: location.id, ...submitData });
+      updateLocation({ id: location.id, data: submitData });
     } else {
       createLocation(submitData);
     }
+
     onOpenChange(false);
   };
 
@@ -105,25 +106,30 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Name + Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Location Name *</Label>
+              <Label>Location Name *</Label>
               <Input
-                id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Main Store, Warehouse A, etc."
                 required
+                placeholder="Main Store, Warehouse A"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
             </div>
 
             <div>
-              <Label htmlFor="location_type">Location Type *</Label>
+              <Label>Location Type *</Label>
               <Select
                 value={formData.location_type}
-                onValueChange={(value) => setFormData({ ...formData, location_type: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, location_type: value })
+                }
               >
-                <SelectTrigger id="location_type">
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -136,14 +142,15 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
             </div>
           </div>
 
+          {/* State + Zone */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="state">State *</Label>
+              <Label>State *</Label>
               <Select
                 value={formData.state}
                 onValueChange={(value) => setFormData({ ...formData, state: value })}
               >
-                <SelectTrigger id="state">
+                <SelectTrigger>
                   <SelectValue placeholder="Select state" />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,12 +162,12 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
             </div>
 
             <div>
-              <Label htmlFor="zone">Zone *</Label>
+              <Label>Zone *</Label>
               <Select
                 value={formData.zone}
                 onValueChange={(value) => setFormData({ ...formData, zone: value })}
               >
-                <SelectTrigger id="zone">
+                <SelectTrigger>
                   <SelectValue placeholder="Select zone" />
                 </SelectTrigger>
                 <SelectContent>
@@ -172,87 +179,101 @@ export function LocationDialog({ open, onOpenChange, location }: LocationDialogP
             </div>
           </div>
 
+          {/* Address */}
           <div>
-            <Label htmlFor="address">Address</Label>
+            <Label>Address</Label>
             <Input
-              id="address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              placeholder="123 Main St, City"
+              placeholder="123 Main Road, Lagos"
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
             />
           </div>
 
+          {/* Phone + Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="phone">Phone</Label>
+              <Label>Phone</Label>
               <Input
-                id="phone"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+234..."
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
               />
             </div>
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label>Email</Label>
               <Input
-                id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="location@example.com"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
           </div>
 
+          {/* Capacity */}
           <div>
-            <Label htmlFor="capacity">Capacity (sq ft)</Label>
+            <Label>Capacity (sq ft)</Label>
             <Input
-              id="capacity"
               type="number"
               value={formData.capacity_sqft}
-              onChange={(e) => setFormData({ ...formData, capacity_sqft: e.target.value })}
-              placeholder="Storage capacity in square feet"
+              placeholder="e.g. 5000"
+              onChange={(e) =>
+                setFormData({ ...formData, capacity_sqft: e.target.value })
+              }
             />
           </div>
 
-          <div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="active"
-                checked={formData.active}
-                onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-              />
-              <Label htmlFor="active">Active</Label>
-            </div>
+          {/* Active toggle */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={formData.active}
+              onCheckedChange={(value) =>
+                setFormData({ ...formData, active: value })
+              }
+            />
+            <Label>Active</Label>
           </div>
 
+          {/* Manager */}
           <div>
-            <Label htmlFor="manager">Location Manager (Optional)</Label>
+            <Label>Location Manager (optional)</Label>
             <Select
               value={formData.manager_id}
-              onValueChange={(value) => setFormData({ ...formData, manager_id: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, manager_id: value })
+              }
             >
-              <SelectTrigger id="manager">
+              <SelectTrigger>
                 <SelectValue placeholder="Select manager" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">None</SelectItem>
-                {managers?.map((manager) => (
-                  <SelectItem key={manager.id} value={manager.id}>
-                    {manager.full_name} ({manager.email})
+                {managers?.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.full_name} ({m.email})
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          {/* Buttons */}
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">{location ? "Update Location" : "Create Location"}</Button>
+            <Button type="submit">
+              {location ? "Update Location" : "Create Location"}
+            </Button>
           </div>
+
         </form>
       </DialogContent>
     </Dialog>

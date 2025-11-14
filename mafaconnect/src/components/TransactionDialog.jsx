@@ -1,33 +1,38 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "@/hookss/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Textarea } from "@/components/uimain/textarea";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/uimain/select";
+} from "@/components/ui/select";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useLocations } from "@/hooks/useLocations";
-import { TRANSACTION_TYPES, calculateDueDate, getPaymentTermsOptions, formatCurrency } from "@/lib/transactionUtils";
+import {
+  TRANSACTION_TYPES,
+  calculateDueDate,
+  getPaymentTermsOptions,
+  formatCurrency,
+} from "@/lib/transactionUtils";
 
-
+// ✅ Zod validation schema
 const transactionSchema = z.object({
   transactionType: z.string(),
   customerId: z.string().optional(),
@@ -38,19 +43,13 @@ const transactionSchema = z.object({
   notes: z.string().optional(),
 });
 
-
-
-
-
-
-
-export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps) {
+export function TransactionDialog({ open, onOpenChange }) {
   const [selectedType, setSelectedType] = useState("cash_sale");
   const [items, setItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [selectedCustomer, setSelectedCustomer] = useState(undefined);
-  const [selectedLocation, setSelectedLocation] = useState(undefined);
+  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
 
   const { user, isStaff, loading: authLoading } = useAuth();
   const { createTransaction, isCreating } = useTransactions();
@@ -65,7 +64,7 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
     setValue,
     reset,
     formState: { errors },
-  } = useForm<TransactionFormData>({
+  } = useForm({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       transactionType: "cash_sale",
@@ -77,29 +76,23 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
   const paymentTerms = watch("paymentTerms");
   const typeConfig = TRANSACTION_TYPES[selectedType];
 
+  // Update due date when payment terms change
   useEffect(() => {
-    if (paymentTerms) {
-      const dueDate = calculateDueDate(paymentTerms);
-      // Due date is calculated but we'll pass it separately
-    }
+    if (paymentTerms) calculateDueDate(paymentTerms);
   }, [paymentTerms]);
 
-  // Reset form state when dialog opens
+  // Reset when dialog reopens
   useEffect(() => {
     if (open) {
-      setSelectedCustomer(undefined);
-      setSelectedLocation(undefined);
+      setSelectedCustomer("");
+      setSelectedLocation("");
       setItems([]);
       setSelectedProduct("");
       setQuantity(1);
       reset({
         transactionType: "cash_sale",
         discount: 0,
-        customerId,
-        locationId,
-        paymentMethod,
-        paymentTerms,
-        notes,
+        notes: "",
       });
     }
   }, [open, reset]);
@@ -110,11 +103,15 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
     const product = products?.find((p) => p.id === selectedProduct);
     if (!product) return;
 
-    const existingItemIndex = items.findIndex((i) => i.productId === selectedProduct);
-    if (existingItemIndex >= 0) {
-      const updatedItems = [...items];
-      updatedItems[existingItemIndex].quantity += quantity;
-      setItems(updatedItems);
+    const existingItem = items.find((i) => i.productId === selectedProduct);
+    if (existingItem) {
+      setItems((prev) =>
+        prev.map((i) =>
+          i.productId === selectedProduct
+            ? { ...i, quantity: i.quantity + quantity }
+            : i
+        )
+      );
     } else {
       setItems([
         ...items,
@@ -135,37 +132,30 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  const tax = subtotal * 0.075; // 7.5% VAT
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.quantity * item.unitPrice,
+    0
+  );
+  const tax = subtotal * 0.075;
   const total = subtotal + tax - discount;
 
-  const onSubmit = (data: TransactionFormData) => {
-    console.log("🔥 FORM SUBMITTED!");
-    console.log("📋 Form data:", data);
-    console.log("📦 Items:", items);
-    console.log("👤 Selected Customer:", selectedCustomer);
-    console.log("📍 Selected Location:", selectedLocation);
-    
-    // Frontend validation
+  const onSubmit = (data) => {
     if (items.length === 0) {
-      alert("Please add at least one item");
+      alert("Please add at least one item.");
       return;
     }
 
-    const typeConfig = TRANSACTION_TYPES[selectedType];
-    
-    // Validate required fields
     if (typeConfig.requiresLocation && !selectedLocation) {
-      alert(`Please select a location for ${typeConfig.label}`);
+      alert(`Please select a location for ${typeConfig.label}.`);
       return;
     }
 
     if (typeConfig.requiresCustomer && !selectedCustomer) {
-      alert(`Please select a customer for ${typeConfig.label}`);
+      alert(`Please select a customer for ${typeConfig.label}.`);
       return;
     }
 
-    const dueDate = data.paymentTerms ? calculateDueDate(data.paymentTerms) ;
+    const dueDate = data.paymentTerms ? calculateDueDate(data.paymentTerms) : null;
 
     createTransaction({
       transactionType: selectedType,
@@ -180,19 +170,19 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
       paymentMethod: data.paymentMethod,
       discount: data.discount,
       notes: data.notes,
-      dueDate: dueDate?.toISOString().split('T')[0],
+      dueDate: dueDate ? dueDate.toISOString().split("T")[0] : null,
     });
 
     onOpenChange(false);
   };
 
-  // Check permissions
+  // Loading / Access Denied states
   if (authLoading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
-          <div className="flex items-center justify-center p-8">
-            <div className="text-muted-foreground">Loading...</div>
+          <div className="flex items-center justify-center p-8 text-muted-foreground">
+            Loading...
           </div>
         </DialogContent>
       </Dialog>
@@ -206,10 +196,8 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
           <DialogHeader>
             <DialogTitle>Access Denied</DialogTitle>
           </DialogHeader>
-          <div className="p-4 text-center">
-            <p className="text-muted-foreground">
-              You do not have permission to create transactions. Staff access is required.
-            </p>
+          <div className="p-4 text-center text-muted-foreground">
+            You do not have permission to create transactions. Staff access is required.
           </div>
         </DialogContent>
       </Dialog>
@@ -223,21 +211,29 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
           <DialogTitle>New Transaction</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit, (errors) => {
-          console.error("❌ FORM VALIDATION FAILED!");
-          console.error("🚨 Validation errors:", errors);
-          alert("Form validation failed. Check console for details.");
-        })} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.error("Form errors:", errors);
+            alert("Form validation failed. Check console for details.");
+          })}
+          className="space-y-6"
+        >
+          {/* Errors Display */}
           {Object.keys(errors).length > 0 && (
             <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
-              <p className="text-sm font-medium text-destructive">Please fix the following errors:</p>
+              <p className="text-sm font-medium text-destructive">
+                Please fix the following errors:
+              </p>
               <ul className="mt-2 text-sm text-destructive list-disc list-inside">
                 {Object.entries(errors).map(([key, error]) => (
-                  <li key={key}>{key}: {error?.message || "Invalid value"}</li>
+                  <li key={key}>
+                    {key}: {error?.message || "Invalid value"}
+                  </li>
                 ))}
               </ul>
             </div>
           )}
+
           {/* Transaction Type */}
           <div>
             <Label>Transaction Type</Label>
@@ -256,7 +252,9 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                   <SelectItem key={key} value={key}>
                     <div>
                       <div className="font-medium">{config.label}</div>
-                      <div className="text-xs text-muted-foreground">{config.description}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {config.description}
+                      </div>
                     </div>
                   </SelectItem>
                 ))}
@@ -267,16 +265,19 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
           {/* Customer */}
           {typeConfig.requiresCustomer && (
             <div>
-              <Label>Customer {typeConfig.requiresCustomer && "*"}</Label>
+              <Label>Customer *</Label>
               {customersLoading ? (
-                <div className="text-sm text-muted-foreground py-2">Loading customers...</div>
-              ) : !customers || customers.length === 0 ? (
-                <div className="text-sm text-destructive py-2">No customers found. Please add customers first.</div>
+                <div className="text-sm text-muted-foreground py-2">
+                  Loading customers...
+                </div>
+              ) : !customers?.length ? (
+                <div className="text-sm text-destructive py-2">
+                  No customers found.
+                </div>
               ) : (
                 <Select
                   value={selectedCustomer}
                   onValueChange={(value) => {
-                    console.log("👤 Customer selected:", value);
                     setSelectedCustomer(value);
                     setValue("customerId", value);
                   }}
@@ -285,9 +286,9 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
+                    {customers.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -299,16 +300,19 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
           {/* Location */}
           {typeConfig.requiresLocation && (
             <div>
-              <Label>Location {typeConfig.requiresLocation && "*"}</Label>
+              <Label>Location *</Label>
               {locationsLoading ? (
-                <div className="text-sm text-muted-foreground py-2">Loading locations...</div>
-              ) : !locations || locations.length === 0 ? (
-                <div className="text-sm text-destructive py-2">No locations found. Please add locations first.</div>
+                <div className="text-sm text-muted-foreground py-2">
+                  Loading locations...
+                </div>
+              ) : !locations?.length ? (
+                <div className="text-sm text-destructive py-2">
+                  No locations found.
+                </div>
               ) : (
                 <Select
                   value={selectedLocation}
                   onValueChange={(value) => {
-                    console.log("📍 Location selected:", value);
                     setSelectedLocation(value);
                     setValue("locationId", value);
                   }}
@@ -317,9 +321,9 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {locations.map((location) => (
-                      <SelectItem key={location.id} value={location.id}>
-                        {location.name} - {location.state}
+                    {locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.id}>
+                        {loc.name} - {loc.state}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -337,9 +341,9 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                   <SelectValue placeholder="Select product" />
                 </SelectTrigger>
                 <SelectContent>
-                  {products?.map((product) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name} - {formatCurrency(product.sale_price)}
+                  {products?.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} - {formatCurrency(p.sale_price)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -360,7 +364,10 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
             {items.length > 0 && (
               <div className="border rounded-lg p-4 space-y-2">
                 {items.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center">
+                  <div
+                    key={index}
+                    className="flex justify-between items-center"
+                  >
                     <div className="flex-1">
                       <div className="font-medium">{item.productName}</div>
                       <div className="text-sm text-muted-foreground">
@@ -395,9 +402,9 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
                   <SelectValue placeholder="Select payment terms" />
                 </SelectTrigger>
                 <SelectContent>
-                  {getPaymentTermsOptions().map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                  {getPaymentTermsOptions().map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -462,8 +469,13 @@ export function TransactionDialog({ open, onOpenChange }: TransactionDialogProps
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isCreating || items.length === 0}>

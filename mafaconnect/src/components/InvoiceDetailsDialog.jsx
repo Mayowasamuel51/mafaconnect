@@ -1,42 +1,33 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Badge } from "@/components/uimain/Badge";
-import { Separator } from "@/components/uimain/separator";
-import { format } from "date-fns";
+import React from "react";
+import axios from "axios";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 import { Download, Edit, Mail } from "lucide-react";
 
-
+const API_URL = import.meta.env.VITE_HOME_OO;
 
 export function InvoiceDetailsDialog({
   invoiceId,
   open,
   onOpenChange,
   onEdit,
-}: InvoiceDetailsDialogProps) {
+}) {
+  // 🔥 Fetch invoice by ID (NO SUPABASE)
   const { data: invoice, isLoading } = useQuery({
     queryKey: ["invoice", invoiceId],
     queryFn: async () => {
       if (!invoiceId) return null;
-      const { data, error } = await supabase
-        .from("invoices")
-        .select(
-          `
-          *,
-          customers(*),
-          invoice_items(*)
-        `
-        )
-        .eq("id", invoiceId)
-        .single();
-
-      if (error) throw error;
-      return data;
+      const res = await axios.get(`${API_URL}/invoices/${invoiceId}`);
+      return res.data;
     },
     enabled: !!invoiceId && open,
   });
 
+  // Status colors for badge
   const getStatusColor = (status) => {
     switch (status) {
       case "paid":
@@ -71,34 +62,35 @@ export function InvoiceDetailsDialog({
             <div className="flex gap-2">
               {invoice.status === "draft" && onEdit && (
                 <Button size="sm" variant="outline" onClick={onEdit}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
+                  <Edit className="mr-2 h-4 w-4" /> Edit
                 </Button>
               )}
               <Button size="sm" variant="outline">
-                <Mail className="mr-2 h-4 w-4" />
-                Send
+                <Mail className="mr-2 h-4 w-4" /> Send
               </Button>
               <Button size="sm" variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                PDF
+                <Download className="mr-2 h-4 w-4" /> PDF
               </Button>
             </div>
           </div>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Header */}
+          {/* Invoice Header */}
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-2xl font-bold">{invoice.invoice_number}</h2>
-              <Badge className={getStatusColor(invoice.status)}>{invoice.status}</Badge>
+              <Badge className={getStatusColor(invoice.status)}>
+                {invoice.status}
+              </Badge>
             </div>
+
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Issue Date</p>
               <p className="font-semibold">
                 {format(new Date(invoice.issue_date), "MMM dd, yyyy")}
               </p>
+
               <p className="text-sm text-muted-foreground mt-2">Due Date</p>
               <p className="font-semibold">
                 {format(new Date(invoice.due_date), "MMM dd, yyyy")}
@@ -114,17 +106,22 @@ export function InvoiceDetailsDialog({
             <p className="font-semibold text-lg">
               {invoice.customers?.name || "Walk-in Customer"}
             </p>
+
             {invoice.customers?.email && (
-              <p className="text-sm text-muted-foreground">{invoice.customers.email}</p>
+              <p className="text-sm text-muted-foreground">
+                {invoice.customers.email}
+              </p>
             )}
             {invoice.customers?.phone && (
-              <p className="text-sm text-muted-foreground">{invoice.customers.phone}</p>
+              <p className="text-sm text-muted-foreground">
+                {invoice.customers.phone}
+              </p>
             )}
           </div>
 
           <Separator />
 
-          {/* Line Items */}
+          {/* Items */}
           <div>
             <h3 className="font-semibold mb-4">Items</h3>
             <div className="space-y-2">
@@ -136,17 +133,24 @@ export function InvoiceDetailsDialog({
                   <div className="col-span-6">
                     <p className="font-medium">{item.description}</p>
                   </div>
+
                   <div className="col-span-2 text-center">
                     <p className="text-sm text-muted-foreground">Qty</p>
                     <p className="font-medium">{item.quantity}</p>
                   </div>
+
                   <div className="col-span-2 text-center">
                     <p className="text-sm text-muted-foreground">Price</p>
-                    <p className="font-medium">₦{Number(item.unit_price).toLocaleString()}</p>
+                    <p className="font-medium">
+                      ₦{Number(item.unit_price).toLocaleString()}
+                    </p>
                   </div>
+
                   <div className="col-span-2 text-right">
                     <p className="text-sm text-muted-foreground">Total</p>
-                    <p className="font-medium">₦{Number(item.line_total).toLocaleString()}</p>
+                    <p className="font-medium">
+                      ₦{Number(item.line_total).toLocaleString()}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -159,8 +163,11 @@ export function InvoiceDetailsDialog({
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium">₦{Number(invoice.subtotal).toLocaleString()}</span>
+              <span className="font-medium">
+                ₦{Number(invoice.subtotal).toLocaleString()}
+              </span>
             </div>
+
             {invoice.tax_amount > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax</span>
@@ -169,6 +176,7 @@ export function InvoiceDetailsDialog({
                 </span>
               </div>
             )}
+
             {invoice.discount_amount > 0 && (
               <div className="flex justify-between text-destructive">
                 <span>Discount</span>
@@ -177,10 +185,14 @@ export function InvoiceDetailsDialog({
                 </span>
               </div>
             )}
+
             <Separator />
+
             <div className="flex justify-between text-lg font-bold">
               <span>Total Amount</span>
-              <span>₦{Number(invoice.total_amount).toLocaleString()}</span>
+              <span>
+                ₦{Number(invoice.total_amount).toLocaleString()}
+              </span>
             </div>
           </div>
 

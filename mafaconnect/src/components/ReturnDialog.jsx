@@ -1,17 +1,15 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
-import { Textarea } from "@/components/uimain/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useReturns } from "@/hooks/useReturns";
 import { useSales } from "@/hooks/useSales";
 import { Plus, X } from "lucide-react";
 
-
-
-export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
+export function ReturnDialog({ open, onOpenChange }) {
   const { createReturn } = useReturns();
   const { sales } = useSales();
 
@@ -19,9 +17,8 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
   const [reason, setReason] = React.useState("");
   const [refundMethod, setRefundMethod] = React.useState("cash");
   const [notes, setNotes] = React.useState("");
-  const [items, setItems] = React.useState<
-    Array<{ productId; quantity; unitPrice; condition: string }>
-  >([]);
+
+  const [items, setItems] = React.useState([]);
 
   const selectedSale = sales?.find((s) => s.id === saleId);
 
@@ -36,8 +33,10 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
       refundMethod,
       notes,
     });
+
     onOpenChange(false);
-    // Reset form
+
+    // reset
     setSaleId("");
     setReason("");
     setRefundMethod("cash");
@@ -53,6 +52,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* SALE SELECT */}
           <div>
             <Label>Select Sale *</Label>
             <Select value={saleId} onValueChange={setSaleId}>
@@ -70,6 +70,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
             </Select>
           </div>
 
+          {/* REASON & METHOD */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Reason *</Label>
@@ -103,18 +104,21 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
             </div>
           </div>
 
+          {/* SALE SUMMARY */}
           {saleId && selectedSale && (
             <div className="border rounded-lg p-4 space-y-2">
               <h3 className="font-semibold">Sale Items</h3>
               <p className="text-sm text-muted-foreground">
-                Select items to return (Total: ₦{Number(selectedSale.total_amount).toLocaleString()})
+                Total: ₦{Number(selectedSale.total_amount).toLocaleString()}
               </p>
-              <div className="text-sm text-muted-foreground">
-                Note: Fetching sale items requires additional implementation
-              </div>
+
+              <p className="text-sm text-muted-foreground">
+                ⚠️ Note: Implement sale-item selection UI if required.
+              </p>
             </div>
           )}
 
+          {/* NOTES */}
           <div>
             <Label>Notes</Label>
             <Textarea
@@ -124,6 +128,7 @@ export function ReturnDialog({ open, onOpenChange }: ReturnDialogProps) {
             />
           </div>
 
+          {/* ACTIONS */}
           <div className="flex gap-2">
             <Button onClick={handleSubmit} disabled={!saleId || !reason}>
               Process Return

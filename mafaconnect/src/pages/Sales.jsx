@@ -1,15 +1,15 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/uimain/select";
+} from "@/components/ui/select";
 import {
   Drawer,
   DrawerClose,
@@ -18,7 +18,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "@/components/uimain/drawer";
+} from "@/components/ui/drawer";
 import { Plus, Search, Receipt, Loader2, X } from "lucide-react";
 import { useSales } from "@/hooks/useSales";
 import { useProducts } from "@/hooks/useProducts";
@@ -33,29 +33,25 @@ export default function Sales() {
   const { products } = useProducts();
   const { customers } = useCustomers();
   const { locations } = useLocations();
-  
-  const [showNewSale, setShowNewSale] = React.useState(false);
-  const [customerId, setCustomerId] = React.useState("");
-  const [locationId, setLocationId] = React.useState("");
-  const [paymentMethod, setPaymentMethod] = React.useState("");
-  const [selectedProducts, setSelectedProducts] = React.useState<Array<{
-    product_id;
-    quantity;
-    unit_price;
-  }>>([]);
-  const [currentProduct, setCurrentProduct] = React.useState("");
-  const [currentQuantity, setCurrentQuantity] = React.useState(1);
-  const [discount, setDiscount] = React.useState(0);
-  const [searchQuery, setSearchQuery] = React.useState("");
 
+  const [showNewSale, setShowNewSale] = useState(false);
+  const [customerId, setCustomerId] = useState("");
+  const [locationId, setLocationId] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [currentProduct, setCurrentProduct] = useState("");
+  const [currentQuantity, setCurrentQuantity] = useState(1);
+  const [discount, setDiscount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // 🔹 Add a product to cart
   const handleAddProduct = () => {
     if (!currentProduct) return;
-    
-    const product = products?.find(p => p.id === currentProduct);
+    const product = products?.find((p) => p.id === currentProduct);
     if (!product) return;
 
-    setSelectedProducts([
-      ...selectedProducts,
+    setSelectedProducts((prev) => [
+      ...prev,
       {
         product_id: currentProduct,
         quantity: currentQuantity,
@@ -66,18 +62,20 @@ export default function Sales() {
     setCurrentQuantity(1);
   };
 
+  // 🔹 Remove a product from cart
   const handleRemoveProduct = (index) => {
-    setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
+    setSelectedProducts((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // 🔹 Calculate subtotal
   const subtotal = selectedProducts.reduce(
     (sum, item) => sum + item.quantity * item.unit_price,
     0
   );
 
+  // 🔹 Create new sale via API
   const handleCreateSale = async () => {
-    if (selectedProducts.length === 0) return;
-    if (!paymentMethod) return;
+    if (selectedProducts.length === 0 || !paymentMethod) return;
 
     await createSale.mutateAsync({
       customer_id: customerId || undefined,
@@ -95,17 +93,19 @@ export default function Sales() {
     setDiscount(0);
   };
 
-  const filteredSales = sales?.filter(sale => {
+  // 🔹 Search & filter sales
+  const filteredSales = sales?.filter((sale) => {
     const customer = sale.customers;
-    const searchLower = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase();
     return (
-      customer?.name?.toLowerCase().includes(searchLower) ||
-      sale.id.toLowerCase().includes(searchLower)
+      customer?.name?.toLowerCase().includes(query) ||
+      sale.id.toLowerCase().includes(query)
     );
   });
 
   return (
     <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Sales</h1>
@@ -122,7 +122,7 @@ export default function Sales() {
         </Button>
       </div>
 
-      {/* New Sale Form - Desktop Card */}
+      {/* 🧾 New Sale (Desktop) */}
       {showNewSale && !isMobile && (
         <Card className="shadow-elevated border-primary/20">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -131,8 +131,10 @@ export default function Sales() {
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
+
           <CardContent>
             <div className="grid gap-6">
+              {/* Customer / Location / Payment */}
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Customer (Optional)</Label>
@@ -141,14 +143,15 @@ export default function Sales() {
                       <SelectValue placeholder="Walk-in customer" />
                     </SelectTrigger>
                     <SelectContent>
-                      {customers?.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>
-                          {customer.name}
+                      {customers?.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
                   <Label>Location (Optional)</Label>
                   <Select value={locationId} onValueChange={setLocationId}>
@@ -156,15 +159,18 @@ export default function Sales() {
                       <SelectValue placeholder="Select location" />
                     </SelectTrigger>
                     <SelectContent>
-                      {locations?.filter(loc => loc.active).map((location) => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name}
-                          {location.state && ` - ${location.state}`}
-                        </SelectItem>
-                      ))}
+                      {locations
+                        ?.filter((l) => l.active)
+                        .map((l) => (
+                          <SelectItem key={l.id} value={l.id}>
+                            {l.name}
+                            {l.state && ` - ${l.state}`}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
                   <Label>Payment Method *</Label>
                   <Select value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -180,6 +186,7 @@ export default function Sales() {
                 </div>
               </div>
 
+              {/* Add Products */}
               <div className="space-y-4">
                 <Label>Add Products</Label>
                 <div className="grid gap-4 md:grid-cols-3">
@@ -189,37 +196,36 @@ export default function Sales() {
                         <SelectValue placeholder="Select product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {products?.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name} - ₦{Number(product.sale_price).toLocaleString()}
+                        {products?.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name} - ₦{Number(p.sale_price).toLocaleString()}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Input
-                      type="number"
-                      placeholder="Qty"
-                      value={currentQuantity}
-                      onChange={(e) => setCurrentQuantity(Number(e.target.value))}
-                      min="1"
-                    />
-                  </div>
+                  <Input
+                    type="number"
+                    placeholder="Qty"
+                    value={currentQuantity}
+                    onChange={(e) => setCurrentQuantity(Number(e.target.value))}
+                    min="1"
+                  />
                 </div>
                 <Button onClick={handleAddProduct} variant="outline" className="w-full">
                   Add to Cart
                 </Button>
               </div>
 
+              {/* Cart */}
               {selectedProducts.length > 0 && (
                 <div className="space-y-2">
                   <Label>Cart Items</Label>
                   <div className="space-y-2 p-4 bg-secondary/50 rounded-lg">
-                    {selectedProducts.map((item, index) => {
-                      const product = products?.find(p => p.id === item.product_id);
+                    {selectedProducts.map((item, i) => {
+                      const product = products?.find((p) => p.id === item.product_id);
                       return (
-                        <div key={index} className="flex justify-between items-center">
+                        <div key={i} className="flex justify-between items-center">
                           <div>
                             <p className="font-medium">{product?.name}</p>
                             <p className="text-sm text-muted-foreground">
@@ -230,11 +236,7 @@ export default function Sales() {
                             <p className="font-semibold">
                               ₦{(item.quantity * item.unit_price).toLocaleString()}
                             </p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveProduct(index)}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => handleRemoveProduct(i)}>
                               Remove
                             </Button>
                           </div>
@@ -245,6 +247,7 @@ export default function Sales() {
                 </div>
               )}
 
+              {/* Discount + Total */}
               <div className="space-y-2">
                 <Label>Discount Amount (₦)</Label>
                 <Input
@@ -270,19 +273,21 @@ export default function Sales() {
               </div>
 
               <div className="flex gap-4 justify-end pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowNewSale(false)}
-                  className="h-11"
-                >
+                <Button variant="outline" onClick={() => setShowNewSale(false)} className="h-11">
                   Cancel
                 </Button>
                 <Button
                   onClick={handleCreateSale}
-                  disabled={selectedProducts.length === 0 || !paymentMethod || createSale.isPending}
+                  disabled={
+                    selectedProducts.length === 0 ||
+                    !paymentMethod ||
+                    createSale.isPending
+                  }
                   className="bg-gradient-primary h-11"
                 >
-                  {createSale.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {createSale.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Complete Sale
                 </Button>
               </div>
@@ -291,166 +296,7 @@ export default function Sales() {
         </Card>
       )}
 
-      {/* New Sale Form - Mobile Drawer */}
-      <Drawer open={showNewSale && isMobile} onOpenChange={setShowNewSale}>
-        <DrawerContent className="max-h-[90vh]">
-          <DrawerHeader>
-            <DrawerTitle>New Sale Transaction</DrawerTitle>
-            <DrawerDescription>Create a new sale and add products</DrawerDescription>
-          </DrawerHeader>
-          <div className="overflow-y-auto px-4">
-            <div className="grid gap-6 pb-6">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <Label>Customer (Optional)</Label>
-                  <Select value={customerId} onValueChange={setCustomerId}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Walk-in customer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers?.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id}>
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Location (Optional)</Label>
-                  <Select value={locationId} onValueChange={setLocationId}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations?.filter(loc => loc.active).map((location) => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name}
-                          {location.state && ` - ${location.state}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Payment Method *</Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="card">Card</SelectItem>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="transfer">Bank Transfer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Label>Add Products</Label>
-                <div className="space-y-3">
-                  <Select value={currentProduct} onValueChange={setCurrentProduct}>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Select product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products?.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} - ₦{Number(product.sale_price).toLocaleString()}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    placeholder="Quantity"
-                    value={currentQuantity}
-                    onChange={(e) => setCurrentQuantity(Number(e.target.value))}
-                    min="1"
-                    className="h-11"
-                  />
-                </div>
-                <Button onClick={handleAddProduct} variant="outline" className="w-full h-11">
-                  Add to Cart
-                </Button>
-              </div>
-
-              {selectedProducts.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Cart Items</Label>
-                  <div className="space-y-2 p-4 bg-secondary/50 rounded-lg">
-                    {selectedProducts.map((item, index) => {
-                      const product = products?.find(p => p.id === item.product_id);
-                      return (
-                        <div key={index} className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium text-sm">{product?.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {item.quantity} × ₦{item.unit_price.toLocaleString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <p className="font-semibold text-sm">
-                              ₦{(item.quantity * item.unit_price).toLocaleString()}
-                            </p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoveProduct(index)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label>Discount Amount (₦)</Label>
-                <Input
-                  type="number"
-                  value={discount}
-                  onChange={(e) => setDiscount(Number(e.target.value))}
-                  min="0"
-                  className="h-11"
-                />
-              </div>
-
-              <div className="flex justify-between items-center p-4 bg-primary/10 rounded-lg">
-                <p className="text-lg font-semibold">Total:</p>
-                <div className="text-right">
-                  {discount > 0 && (
-                    <p className="text-sm text-muted-foreground line-through">
-                      ₦{subtotal.toLocaleString()}
-                    </p>
-                  )}
-                  <p className="text-2xl font-bold">
-                    ₦{(subtotal - discount).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <DrawerFooter className="pt-2">
-            <Button
-              onClick={handleCreateSale}
-              disabled={selectedProducts.length === 0 || !paymentMethod || createSale.isPending}
-              className="bg-gradient-primary h-12 w-full"
-            >
-              {createSale.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Complete Sale
-            </Button>
-            <DrawerClose asChild>
-              <Button variant="outline" className="h-12">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-
+      {/* 🧾 Sales History */}
       <Card className="shadow-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -476,7 +322,6 @@ export default function Sales() {
               {filteredSales.map((sale) => {
                 const customer = sale.customers;
                 const saleItems = sale.sale_items;
-                
                 return (
                   <div
                     key={sale.id}
@@ -512,7 +357,9 @@ export default function Sales() {
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              {searchQuery ? "No sales found matching your search." : "No sales yet. Create your first sale!"}
+              {searchQuery
+                ? "No sales found matching your search."
+                : "No sales yet. Create your first sale!"}
             </div>
           )}
         </CardContent>

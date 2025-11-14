@@ -4,34 +4,30 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Checkbox } from "@/components/uimain/checkbox";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductLocations } from "@/hooks/useProductLocations";
-import { ScrollArea } from "@/components/uimain/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Package } from "lucide-react";
-
-
 
 export function BulkAddProductsDialog({
   open,
   onOpenChange,
   locationId,
   existingProductIds,
-}: BulkAddProductsDialogProps) {
+}) {
   const { products } = useProducts();
   const { updateProductLocationStock } = useProductLocations();
-  const [selectedProducts, setSelectedProducts] = React.useState<
-    Record<string, { selected; quantity; reorderLevel: number }>
-  >({});
 
-  // Filter out products already at this location
-  const availableProducts = products?.filter(
-    (product) => !existingProductIds.includes(product.id)
-  ) || [];
+  const [selectedProducts, setSelectedProducts] = React.useState({});
+
+  // Only show products NOT already assigned to this location
+  const availableProducts =
+    products?.filter((p) => !existingProductIds.includes(p.id)) || [];
 
   const handleToggleProduct = (productId) => {
     setSelectedProducts((prev) => ({
@@ -49,7 +45,7 @@ export function BulkAddProductsDialog({
       ...prev,
       [productId]: {
         ...prev[productId],
-        quantity = 0 ? quantity : 0,
+        quantity: quantity,
       },
     }));
   };
@@ -59,17 +55,17 @@ export function BulkAddProductsDialog({
       ...prev,
       [productId]: {
         ...prev[productId],
-        reorderLevel = 0 ? level : 0,
+        reorderLevel: level,
       },
     }));
   };
 
   const handleBulkAdd = () => {
-    const productsToAdd = Object.entries(selectedProducts).filter(
-      ([_, data]) => data.selected
+    const selected = Object.entries(selectedProducts).filter(
+      ([, data]) => data.selected
     );
 
-    productsToAdd.forEach(([productId, data]) => {
+    selected.forEach(([productId, data]) => {
       updateProductLocationStock({
         productId,
         locationId,
@@ -82,7 +78,9 @@ export function BulkAddProductsDialog({
     onOpenChange(false);
   };
 
-  const selectedCount = Object.values(selectedProducts).filter((p) => p.selected).length;
+  const selectedCount = Object.values(selectedProducts).filter(
+    (p) => p.selected
+  ).length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -109,16 +107,22 @@ export function BulkAddProductsDialog({
                       checked={selectedProducts[product.id]?.selected || false}
                       onCheckedChange={() => handleToggleProduct(product.id)}
                     />
+
                     <div className="flex-1 space-y-3">
                       <div>
                         <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
+                        <p className="text-sm text-muted-foreground">
+                          SKU: {product.sku}
+                        </p>
                       </div>
-                      
+
                       {selectedProducts[product.id]?.selected && (
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <Label htmlFor={`qty-${product.id}`} className="text-xs">
+                            <Label
+                              htmlFor={`qty-${product.id}`}
+                              className="text-xs"
+                            >
                               Initial Stock
                             </Label>
                             <Input
@@ -135,15 +139,21 @@ export function BulkAddProductsDialog({
                               className="h-8"
                             />
                           </div>
+
                           <div>
-                            <Label htmlFor={`reorder-${product.id}`} className="text-xs">
+                            <Label
+                              htmlFor={`reorder-${product.id}`}
+                              className="text-xs"
+                            >
                               Reorder Level
                             </Label>
                             <Input
                               id={`reorder-${product.id}`}
                               type="number"
                               min="0"
-                              value={selectedProducts[product.id]?.reorderLevel || 10}
+                              value={
+                                selectedProducts[product.id]?.reorderLevel || 10
+                              }
                               onChange={(e) =>
                                 handleReorderLevelChange(
                                   product.id,
@@ -163,13 +173,19 @@ export function BulkAddProductsDialog({
 
             <div className="flex items-center justify-between pt-4 border-t">
               <p className="text-sm text-muted-foreground">
-                {selectedCount} product{selectedCount !== 1 ? "s" : ""} selected
+                {selectedCount} product
+                {selectedCount !== 1 ? "s" : ""} selected
               </p>
+
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleBulkAdd} disabled={selectedCount === 0}>
+
+                <Button
+                  onClick={handleBulkAdd}
+                  disabled={selectedCount === 0}
+                >
                   Add Products
                 </Button>
               </div>

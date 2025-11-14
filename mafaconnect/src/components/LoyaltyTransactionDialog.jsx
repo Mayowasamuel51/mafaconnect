@@ -1,19 +1,16 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Textarea } from "@/components/uimain/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/uimain/select";
-import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useCustomers } from "@/hooks/useCustomers";
 
-
-
-export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransactionDialogProps) {
+export function LoyaltyTransactionDialog({ open, onOpenChange }) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [customerId, setCustomerId] = React.useState("");
   const [points, setPoints] = React.useState("");
@@ -22,7 +19,19 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
   const { customers } = useCustomers();
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // ---- Generic API helper ----
+  const api = async (url, method = "GET", body) => {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -37,33 +46,37 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
       const pointsValue = parseInt(points);
       const actualPoints = type === "redeem" ? -pointsValue : pointsValue;
 
-      // Create transaction
-      const { error: txError } = await supabase.from("loyalty_transactions").insert({
-        loyalty_account_id: loyaltyAccount.id,
+      // ------------------------------
+      // 1️⃣ CREATE loyalty transaction
+      // ------------------------------
+      await api("/api/loyalty/transactions", "POST", {
+        loyaltyAccountId: loyaltyAccount.id,
         points: actualPoints,
-        type = == "earn" ? "manual_credit" : "manual_debit",
+        type: type === "earn" ? "manual_credit" : "manual_debit",
         note,
       });
 
-      if (txError) throw txError;
+      // ------------------------------
+      // 2️⃣ UPDATE loyalty balance
+      // ------------------------------
+      await api(`/api/loyalty/accounts/${loyaltyAccount.id}`, "PUT", {
+        points_balance: loyaltyAccount.points_balance + actualPoints,
+      });
 
-      // Update balance
-      const newBalance = loyaltyAccount.points_balance + actualPoints;
-      const { error: updateError } = await supabase
-        .from("loyalty_accounts")
-        .update({ points_balance: newBalance })
-        .eq("id", loyaltyAccount.id);
+      toast.success(
+        type === "earn" ? "Points awarded successfully!" : "Points redeemed successfully!"
+      );
 
-      if (updateError) throw updateError;
-
-      toast.success(`${type === "earn" ? "Points awarded" : "Points redeemed"} successfully!`);
+      // Refresh React Query caches
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       queryClient.invalidateQueries({ queryKey: ["loyalty-stats"] });
-      
+
+      // Reset fields
       setCustomerId("");
       setPoints("");
       setType("earn");
       setNote("");
+
       onOpenChange(false);
     } catch (error) {
       toast.error(error.message || "Failed to process transaction");
@@ -78,11 +91,14 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
         <DialogHeader>
           <DialogTitle>Loyalty Points Transaction</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Customer */}
           <div className="space-y-2">
-            <Label htmlFor="customer">Select Customer *</Label>
+            <Label>Select Customer *</Label>
             <Select value={customerId} onValueChange={setCustomerId} required>
-              <SelectTrigger id="customer">
+              <SelectTrigger>
                 <SelectValue placeholder="Choose a customer" />
               </SelectTrigger>
               <SelectContent>
@@ -95,11 +111,12 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
             </Select>
           </div>
 
+          {/* Type + Points */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="type">Transaction Type *</Label>
-              <Select value={type} onValueChange={(v) => setType(v as "earn" | "redeem")}>
-                <SelectTrigger id="type">
+              <Label>Transaction Type *</Label>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,23 +127,22 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="points">Points *</Label>
+              <Label>Points *</Label>
               <Input
-                id="points"
                 type="number"
                 value={points}
                 onChange={(e) => setPoints(e.target.value)}
                 placeholder="100"
-                min="1"
+                min={1}
                 required
               />
             </div>
           </div>
 
+          {/* Note */}
           <div className="space-y-2">
-            <Label htmlFor="note">Note (Optional)</Label>
+            <Label>Note (Optional)</Label>
             <Textarea
-              id="note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Reason for transaction..."
@@ -134,11 +150,16 @@ export function LoyaltyTransactionDialog({ open, onOpenChange }: LoyaltyTransact
             />
           </div>
 
+          {/* Actions */}
           <div className="flex gap-3 justify-end pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || !customerId} className="bg-gradient-primary">
+            <Button
+              type="submit"
+              disabled={isSubmitting || !customerId}
+              className="bg-gradient-primary"
+            >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {type === "earn" ? "Award Points" : "Redeem Points"}
             </Button>

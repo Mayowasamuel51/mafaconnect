@@ -13,6 +13,21 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import { CustomerProtectedRoute } from "./components/CustomerProtectedRoute";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import StockTransfers from "./pages/StockTransfers";
+import CustomerOrderManagement from "./pages/CustomerOrderManagement";
+import Sales from "./pages/Sales";
+import Transactions from "./pages/Transactions";
+import AuthProtectedRoute from "./components/AuthProtectedRoute";
+import Products from "./pages/Products";
+import Customers from "./pages/Customers";
+import Loyalty from "./pages/Loyalty";
+import Analytics from "./pages/Analytics";
+import Invoices from "./pages/Invoices";
+import Returns from "./pages/Returns";
+import Locations from "./pages/Locations";
+import LocationDetail from "./pages/LocationDetail";
+import Suppliers from "./pages/Suppliers";
+import PurchaseOrders from "./pages/PurchaseOrders";
 
 const queryClient = new QueryClient();
 
@@ -171,7 +186,7 @@ function App() {
             }
           />
           {/* Staff Routes */}
-          {/* <Route
+          <Route
             path="/"
             element={
               <ProtectedRoute>
@@ -320,7 +335,7 @@ function App() {
                 </DashboardLayout>
               </ProtectedRoute>
             }
-          /> */}
+          />
           {/* <Route
             path="/admin"
             element={

@@ -1,17 +1,16 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Textarea } from "@/components/uimain/textarea";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 
-
-
-export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
+export function ProductDialog({ open, onOpenChange }) {
   const { createProduct } = useProducts();
-  const [formData, setFormData] = React.useState({
+
+  const [formData, setFormData] = useState({
     name: "",
     sku: "",
     description: "",
@@ -21,12 +20,16 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
     reorder_level: "50",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     await createProduct.mutateAsync({
-      name: formData.name,
-      sku: formData.sku,
+      name: formData.name.trim(),
+      sku: formData.sku.trim(),
       description: formData.description || null,
       cost_price: parseFloat(formData.cost_price),
       sale_price: parseFloat(formData.sale_price),
@@ -44,6 +47,7 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
       stock_qty: "",
       reorder_level: "50",
     });
+
     onOpenChange(false);
   };
 
@@ -53,36 +57,41 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Product Name */}
           <div className="space-y-2">
             <Label htmlFor="name">Product Name *</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => handleChange("name", e.target.value)}
               required
             />
           </div>
 
+          {/* SKU */}
           <div className="space-y-2">
             <Label htmlFor="sku">SKU *</Label>
             <Input
               id="sku"
               value={formData.sku}
-              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+              onChange={(e) => handleChange("sku", e.target.value)}
               required
             />
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => handleChange("description", e.target.value)}
             />
           </div>
 
+          {/* Prices */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cost_price">Cost Price (₦) *</Label>
@@ -91,11 +100,10 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 type="number"
                 step="0.01"
                 value={formData.cost_price}
-                onChange={(e) => setFormData({ ...formData, cost_price: e.target.value })}
+                onChange={(e) => handleChange("cost_price", e.target.value)}
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="sale_price">Sale Price (₦) *</Label>
               <Input
@@ -103,12 +111,13 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 type="number"
                 step="0.01"
                 value={formData.sale_price}
-                onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
+                onChange={(e) => handleChange("sale_price", e.target.value)}
                 required
               />
             </div>
           </div>
 
+          {/* Stock and Reorder Level */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="stock_qty">Stock Quantity *</Label>
@@ -116,28 +125,30 @@ export function ProductDialog({ open, onOpenChange }: ProductDialogProps) {
                 id="stock_qty"
                 type="number"
                 value={formData.stock_qty}
-                onChange={(e) => setFormData({ ...formData, stock_qty: e.target.value })}
+                onChange={(e) => handleChange("stock_qty", e.target.value)}
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="reorder_level">Reorder Level</Label>
               <Input
                 id="reorder_level"
                 type="number"
                 value={formData.reorder_level}
-                onChange={(e) => setFormData({ ...formData, reorder_level: e.target.value })}
+                onChange={(e) => handleChange("reorder_level", e.target.value)}
               />
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-3 justify-end pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={createProduct.isPending}>
-              {createProduct.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createProduct.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Add Product
             </Button>
           </div>

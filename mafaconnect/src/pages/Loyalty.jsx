@@ -1,52 +1,49 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
-import { Badge } from "@/components/uimain/Badge";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { Plus, Gift, Award, TrendingUp, Coins, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useRewards } from "@/hooks/useRewards";
 import { useLoyaltyStats } from "@/hooks/useLoyaltyStats";
-import { useAuth } from "@/hookss/useAuth";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { RewardDialog } from "@/components/RewardDialog";
 import { LoyaltyTransactionDialog } from "@/components/LoyaltyTransactionDialog";
 import { format } from "date-fns";
+
+async function fetchAPI(url) {
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 export default function Loyalty() {
   const { rewards, isLoading } = useRewards();
   const { stats } = useLoyaltyStats();
   const { user, isStaff } = useAuth();
-  const [showRewardDialog, setShowRewardDialog] = React.useState(false);
-  const [showTransactionDialog, setShowTransactionDialog] = React.useState(false);
 
-  // Fetch customer's loyalty account
-  const { data: loyaltyAccount, isLoading: loadingAccount } = useQuery({
+  const [showRewardDialog, setShowRewardDialog] = useState(false);
+  const [showTransactionDialog, setShowTransactionDialog] = useState(false);
+
+  // 🔹 Fetch current user's loyalty account
+  const {
+    data: loyaltyAccount,
+    isLoading: loadingAccount,
+  } = useQuery({
     queryKey: ["customer-loyalty-account", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("loyalty_accounts")
-        .select("*")
-        .eq("customer_id", user?.id)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () =>
+      fetchAPI(`/api/loyalty/accounts/${user?.id}`), // expects { id, tier, points_balance }
     enabled: !!user?.id && !isStaff,
   });
 
-  // Fetch customer's recent transactions
+  // 🔹 Fetch recent transactions
   const { data: recentTransactions } = useQuery({
     queryKey: ["customer-loyalty-transactions", loyaltyAccount?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("loyalty_transactions")
-        .select("*")
-        .eq("loyalty_account_id", loyaltyAccount?.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () =>
+      fetchAPI(`/api/loyalty/transactions?account_id=${loyaltyAccount?.id}`),
     enabled: !!loyaltyAccount?.id && !isStaff,
   });
 
@@ -70,26 +67,39 @@ export default function Loyalty() {
       name: "Silver",
       minPoints: 1000,
       maxPoints: 2999,
-      benefits: ["Earn 1.25 points per ₦100", "Priority support", "Exclusive rewards"],
+      benefits: [
+        "Earn 1.25 points per ₦100",
+        "Priority support",
+        "Exclusive rewards",
+      ],
       color: "text-muted-foreground",
     },
     {
       name: "Gold",
       minPoints: 3000,
       maxPoints: 4999,
-      benefits: ["Earn 1.5 points per ₦100", "Premium support", "Birthday bonus"],
+      benefits: [
+        "Earn 1.5 points per ₦100",
+        "Premium support",
+        "Birthday bonus",
+      ],
       color: "text-warning",
     },
     {
       name: "Platinum",
       minPoints: 5000,
-      maxPoints,
-      benefits: ["Earn 2 points per ₦100", "VIP support", "Free shipping", "Early access"],
+      maxPoints: Infinity,
+      benefits: [
+        "Earn 2 points per ₦100",
+        "VIP support",
+        "Free shipping",
+        "Early access",
+      ],
       color: "text-accent",
     },
   ];
 
-  // Customer View
+  // 🔸 Customer view
   if (!isStaff) {
     return (
       <div className="space-y-6">
@@ -106,7 +116,9 @@ export default function Loyalty() {
               <Coins className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{loyaltyAccount?.points_balance || 0}</div>
+              <div className="text-2xl font-bold">
+                {loyaltyAccount?.points_balance || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Available to redeem</p>
             </CardContent>
           </Card>
@@ -117,7 +129,9 @@ export default function Loyalty() {
               <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{loyaltyAccount?.tier || "Silver"}</div>
+              <div className="text-2xl font-bold">
+                {loyaltyAccount?.tier || "Silver"}
+              </div>
               <p className="text-xs text-muted-foreground">Member status</p>
             </CardContent>
           </Card>
@@ -129,14 +143,16 @@ export default function Loyalty() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {recentTransactions?.filter(t => t.type === 'earn').reduce((sum, t) => sum + t.points, 0) || 0}
+                {recentTransactions
+                  ?.filter((t) => t.type === "earn")
+                  .reduce((sum, t) => sum + t.points, 0) || 0}
               </div>
               <p className="text-xs text-muted-foreground">All time points</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Tier Information */}
+        {/* Tiers */}
         <Card>
           <CardHeader>
             <CardTitle>Loyalty Tiers</CardTitle>
@@ -147,26 +163,30 @@ export default function Loyalty() {
                 <div
                   key={tier.name}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    loyaltyAccount?.tier === tier.name 
-                      ? 'bg-primary/10 border-primary' 
-                      : 'bg-secondary/30 border-border'
+                    loyaltyAccount?.tier === tier.name
+                      ? "bg-primary/10 border-primary"
+                      : "bg-secondary/30 border-border"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Award className={`h-5 w-5 ${tier.color}`} />
-                    <h3 className={`text-lg font-bold ${tier.color}`}>{tier.name}</h3>
+                    <h3 className={`text-lg font-bold ${tier.color}`}>
+                      {tier.name}
+                    </h3>
                     {loyaltyAccount?.tier === tier.name && (
-                      <Badge variant="default" className="ml-auto">Current</Badge>
+                      <Badge variant="default" className="ml-auto">
+                        Current
+                      </Badge>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mb-3">
-                    {tier.minPoints.toLocaleString()} - {tier.maxPoints?.toLocaleString() || "∞"} points
+                    {tier.minPoints.toLocaleString()} -{" "}
+                    {tier.maxPoints?.toLocaleString() || "∞"} points
                   </p>
                   <ul className="space-y-1">
-                    {tier.benefits.map((benefit, index) => (
-                      <li key={index} className="text-sm flex items-start gap-2">
-                        <span className="text-primary mt-1">•</span>
-                        {benefit}
+                    {tier.benefits.map((b, i) => (
+                      <li key={i} className="text-sm flex items-start gap-2">
+                        <span className="text-primary mt-1">•</span> {b}
                       </li>
                     ))}
                   </ul>
@@ -176,25 +196,24 @@ export default function Loyalty() {
           </CardContent>
         </Card>
 
-        {/* Available Rewards */}
+        {/* Rewards */}
         <Card>
           <CardHeader>
             <CardTitle>Available Rewards</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              {rewards?.filter(r => r.active).map((reward) => (
-                <div
-                  key={reward.id}
-                  className="p-4 rounded-lg bg-card border"
-                >
+              {rewards?.filter((r) => r.active).map((reward) => (
+                <div key={reward.id} className="p-4 rounded-lg bg-card border">
                   <div className="flex items-start gap-3 mb-3">
                     <div className="p-2 rounded-lg bg-gradient-primary">
                       <Gift className="h-4 w-4 text-primary-foreground" />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold mb-1">{reward.title}</h3>
-                      <p className="text-sm text-muted-foreground">{reward.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {reward.description}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
@@ -219,32 +238,39 @@ export default function Loyalty() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            {recentTransactions && recentTransactions.length > 0 ? (
+            {recentTransactions?.length > 0 ? (
               <div className="space-y-2">
-                {recentTransactions.map((transaction) => (
+                {recentTransactions.map((t) => (
                   <div
-                    key={transaction.id}
+                    key={t.id}
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
                     <div>
-                      <p className="font-medium capitalize">{transaction.type}</p>
+                      <p className="font-medium capitalize">{t.type}</p>
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(transaction.created_at), "MMM d, yyyy")}
+                        {format(new Date(t.created_at), "MMM d, yyyy")}
                       </p>
-                      {transaction.note && (
-                        <p className="text-sm text-muted-foreground">{transaction.note}</p>
+                      {t.note && (
+                        <p className="text-sm text-muted-foreground">{t.note}</p>
                       )}
                     </div>
-                    <div className={`text-lg font-bold ${
-                      transaction.type === 'earn' ? 'text-success' : 'text-muted-foreground'
-                    }`}>
-                      {transaction.type === 'earn' ? '+' : '-'}{transaction.points}
+                    <div
+                      className={`text-lg font-bold ${
+                        t.type === "earn"
+                          ? "text-success"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {t.type === "earn" ? "+" : "-"}
+                      {t.points}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-8">No transactions yet</p>
+              <p className="text-center text-muted-foreground py-8">
+                No transactions yet
+              </p>
             )}
           </CardContent>
         </Card>
@@ -252,38 +278,42 @@ export default function Loyalty() {
     );
   }
 
-  // Staff View
+  // 🔸 Staff View
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Loyalty Program</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Loyalty Program
+          </h1>
           <p className="text-muted-foreground">
             Manage rewards and loyalty tiers
           </p>
         </div>
         <div className="flex gap-3">
-          <Button 
+          <Button
             onClick={() => setShowTransactionDialog(true)}
             variant="outline"
             className="shadow-md hover:shadow-lg transition-all"
           >
-            <Coins className="mr-2 h-4 w-4" />
-            Points Transaction
+            <Coins className="mr-2 h-4 w-4" /> Points Transaction
           </Button>
-          <Button 
+          <Button
             onClick={() => setShowRewardDialog(true)}
             className="bg-gradient-primary shadow-md hover:shadow-lg transition-all"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Reward
+            <Plus className="mr-2 h-4 w-4" /> Create Reward
           </Button>
         </div>
       </div>
 
       <RewardDialog open={showRewardDialog} onOpenChange={setShowRewardDialog} />
-      <LoyaltyTransactionDialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog} />
+      <LoyaltyTransactionDialog
+        open={showTransactionDialog}
+        onOpenChange={setShowTransactionDialog}
+      />
 
+      {/* Staff Stats */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="shadow-card">
           <CardContent className="p-6">
@@ -294,11 +324,11 @@ export default function Loyalty() {
               <p className="text-sm text-muted-foreground">Points Distributed</p>
             </div>
             <p className="text-3xl font-bold text-foreground">
-              {stats?.totalPointsDistributed.toLocaleString() || 0}
+              {stats?.totalPointsDistributed?.toLocaleString() || 0}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">All time</p>
           </CardContent>
         </Card>
+
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
@@ -308,11 +338,11 @@ export default function Loyalty() {
               <p className="text-sm text-muted-foreground">Rewards Redeemed</p>
             </div>
             <p className="text-3xl font-bold text-foreground">
-              {stats?.rewardsRedeemed.toLocaleString() || 0}
+              {stats?.rewardsRedeemed?.toLocaleString() || 0}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">All time</p>
           </CardContent>
         </Card>
+
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-2">
@@ -322,90 +352,11 @@ export default function Loyalty() {
               <p className="text-sm text-muted-foreground">Active Members</p>
             </div>
             <p className="text-3xl font-bold text-foreground">
-              {stats?.activeMembers.toLocaleString() || 0}
+              {stats?.activeMembers?.toLocaleString() || 0}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">All tiers</p>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle>Loyalty Tiers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {tierConfig.map((tier) => (
-              <div
-                key={tier.name}
-                className="p-6 rounded-xl border-2 bg-secondary/30 hover:bg-secondary/50 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Award className={`h-6 w-6 ${tier.color}`} />
-                  <h3 className={`text-xl font-bold ${tier.color}`}>
-                    {tier.name}
-                  </h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {tier.minPoints.toLocaleString()} - {tier.maxPoints?.toLocaleString() || "∞"} points
-                </p>
-                <ul className="space-y-2">
-                  {tier.benefits.map((benefit, index) => (
-                    <li key={index} className="text-sm text-foreground flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle>Available Rewards</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            {rewards?.map((reward) => (
-              <div
-                key={reward.id}
-                className="p-6 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-gradient-primary">
-                      <Gift className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">
-                        {reward.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {reward.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
-                      {reward.points_cost.toLocaleString()} points
-                    </Badge>
-                    {reward.stock_limit && (
-                      <span className="text-sm text-muted-foreground">
-                        Stock: {reward.stock_limit}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

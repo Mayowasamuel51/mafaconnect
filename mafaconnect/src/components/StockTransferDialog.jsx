@@ -1,18 +1,16 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Textarea } from "@/components/uimain/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
 import { useStockTransfers } from "@/hooks/useStockTransfers";
 import { useProducts } from "@/hooks/useProducts";
 import { useLocations } from "@/hooks/useLocations";
 import { LocationSelector } from "./LocationSelector";
 import { ArrowRight, Package } from "lucide-react";
 
-
-
-export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogProps) {
+export function StockTransferDialog({ open, onOpenChange }) {
   const { createTransfer } = useStockTransfers();
   const { products } = useProducts();
   const { locations } = useLocations();
@@ -57,6 +55,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Product selection */}
           <div>
             <Label>Product *</Label>
             <select
@@ -73,6 +72,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
             </select>
           </div>
 
+          {/* Location selection */}
           <div className="grid grid-cols-2 gap-4 items-center">
             <div>
               <Label>From Location *</Label>
@@ -99,6 +99,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
             </div>
           </div>
 
+          {/* Quantity */}
           <div>
             <Label>Quantity *</Label>
             <Input
@@ -110,6 +111,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
             />
           </div>
 
+          {/* Expected Delivery Date */}
           <div>
             <Label>Expected Delivery Date</Label>
             <Input
@@ -119,6 +121,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
             />
           </div>
 
+          {/* Notes */}
           <div>
             <Label>Notes</Label>
             <Textarea
@@ -129,6 +132,7 @@ export function StockTransferDialog({ open, onOpenChange }: StockTransferDialogP
             />
           </div>
 
+          {/* Action buttons */}
           <div className="flex gap-2">
             <Button
               onClick={handleSubmit}

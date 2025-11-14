@@ -1,22 +1,31 @@
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/uimain/dialog";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
-import { Label } from "@/components/uimain/label";
-import { Textarea } from "@/components/uimain/textarea";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Textarea } from "@/components/ui/textarea";
 import { useSuppliers } from "@/hooks/useSuppliers";
 
-
-
-export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
+export function SupplierDialog({ open, onOpenChange }) {
   const { createSupplier } = useSuppliers();
-  const [name, setName] = React.useState("");
-  const [contactPerson, setContactPerson] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [phone, setPhone] = React.useState("");
-  const [address, setAddress] = React.useState("");
-  const [paymentTerms, setPaymentTerms] = React.useState("");
-  const [notes, setNotes] = React.useState("");
+
+  const [name, setName] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const resetForm = () => {
+    setName("");
+    setContactPerson("");
+    setEmail("");
+    setPhone("");
+    setAddress("");
+    setPaymentTerms("");
+    setNotes("");
+  };
 
   const handleSubmit = () => {
     if (!name) return;
@@ -32,14 +41,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
     });
 
     onOpenChange(false);
-    // Reset form
-    setName("");
-    setContactPerson("");
-    setEmail("");
-    setPhone("");
-    setAddress("");
-    setPaymentTerms("");
-    setNotes("");
+    resetForm();
   };
 
   return (
@@ -50,6 +52,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Row 1 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Supplier Name *</Label>
@@ -70,6 +73,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
             </div>
           </div>
 
+          {/* Row 2 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Email</Label>
@@ -91,6 +95,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
             </div>
           </div>
 
+          {/* Address */}
           <div>
             <Label>Address</Label>
             <Input
@@ -100,6 +105,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
             />
           </div>
 
+          {/* Payment Terms */}
           <div>
             <Label>Payment Terms</Label>
             <Input
@@ -109,6 +115,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
             />
           </div>
 
+          {/* Notes */}
           <div>
             <Label>Notes</Label>
             <Textarea
@@ -118,6 +125,7 @@ export function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
             />
           </div>
 
+          {/* Action Buttons */}
           <div className="flex gap-2">
             <Button onClick={handleSubmit} disabled={!name}>
               Create Supplier

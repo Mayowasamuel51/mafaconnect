@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
-import { Badge } from "@/components/uimain/Badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/Badge";
 import { useStockTransfers } from "@/hooks/useStockTransfers";
 import { StockTransferDialog } from "@/components/StockTransferDialog";
 import { ArrowRight, ArrowRightLeft, Check, Clock, Package, X } from "lucide-react";
@@ -11,11 +11,20 @@ import { format } from "date-fns";
 export default function StockTransfers() {
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const { stockTransfers, isLoading, isError, error, approveTransfer, completeTransfer, cancelTransfer } =
-    useStockTransfers();
 
+  const {
+    stockTransfers,
+    isLoading,
+    isError,
+    error,
+    approveTransfer,
+    completeTransfer,
+    cancelTransfer,
+  } = useStockTransfers();
+
+  // ✅ Moved Record typing → plain JS object
   const getStatusBadge = (status) => {
-    const variants: Record<string, { variant; icon: any }> = {
+    const variants = {
       pending: { variant: "secondary", icon: Clock },
       approved: { variant: "default", icon: Check },
       in_transit: { variant: "default", icon: Package },
@@ -86,9 +95,7 @@ export default function StockTransfers() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">
-                      {transfer.product?.name}
-                    </CardTitle>
+                    <CardTitle className="text-lg">{transfer.product?.name}</CardTitle>
                     <CardDescription>
                       {transfer.movement_number} • {transfer.quantity} units
                     </CardDescription>
@@ -96,8 +103,10 @@ export default function StockTransfers() {
                   {getStatusBadge(transfer.status)}
                 </div>
               </CardHeader>
+
               <CardContent>
                 <div className="space-y-4">
+                  {/* Locations */}
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="font-medium">{transfer.from_location?.name}</p>
@@ -114,6 +123,7 @@ export default function StockTransfers() {
                     </div>
                   </div>
 
+                  {/* Dates */}
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Created</p>
@@ -127,6 +137,7 @@ export default function StockTransfers() {
                     )}
                   </div>
 
+                  {/* Notes */}
                   {transfer.notes && (
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">Notes</p>
@@ -134,12 +145,10 @@ export default function StockTransfers() {
                     </div>
                   )}
 
+                  {/* Actions */}
                   {transfer.status === "pending" && (
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => approveTransfer(transfer.id)}
-                      >
+                      <Button size="sm" onClick={() => approveTransfer(transfer.id)}>
                         Approve
                       </Button>
                       <Button
@@ -153,11 +162,8 @@ export default function StockTransfers() {
                   )}
 
                   {transfer.status === "approved" && (
-                    <Button
-                      size="sm"
-                      onClick={() => completeTransfer(transfer.id)}
-                    >
-                      Mark
+                    <Button size="sm" onClick={() => completeTransfer(transfer.id)}>
+                      Mark as Complete
                     </Button>
                   )}
                 </div>
@@ -174,13 +180,15 @@ export default function StockTransfers() {
                   Before creating transfers, make sure you have:
                 </p>
               </div>
+
+              {/* Instructions */}
               <div className="space-y-2 text-sm text-muted-foreground max-w-lg mx-auto">
                 <div className="flex items-start gap-2 text-left">
                   <span className="font-semibold text-foreground">1.</span>
                   <p>
                     <strong className="text-foreground">Multiple Locations:</strong> Create at least 2 locations (warehouse, stores, etc.)
-                    <Button 
-                      variant="link" 
+                    <Button
+                      variant="link"
                       className="h-auto p-0 ml-1"
                       onClick={() => navigate("/locations")}
                     >
@@ -192,8 +200,8 @@ export default function StockTransfers() {
                   <span className="font-semibold text-foreground">2.</span>
                   <p>
                     <strong className="text-foreground">Products Assigned to Locations:</strong> Go to Products and assign them to locations with initial stock
-                    <Button 
-                      variant="link" 
+                    <Button
+                      variant="link"
                       className="h-auto p-0 ml-1"
                       onClick={() => navigate("/products")}
                     >
@@ -208,6 +216,7 @@ export default function StockTransfers() {
                   </p>
                 </div>
               </div>
+
               <Button onClick={() => setDialogOpen(true)} size="lg" className="mt-4">
                 <Package className="mr-2 h-4 w-4" />
                 Create Your First Transfer
@@ -217,6 +226,7 @@ export default function StockTransfers() {
         )}
       </div>
 
+      {/* Dialog */}
       <StockTransferDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   );

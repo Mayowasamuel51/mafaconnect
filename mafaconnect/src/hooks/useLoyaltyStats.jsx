@@ -1,33 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+
+// 🔹 Generic API fetcher
+async function fetchAPI(url) {
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 export function useLoyaltyStats() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["loyalty-stats"],
     queryFn: async () => {
-      // Get total points distributed
-      const { data: earnedPoints } = await supabase
-        .from("loyalty_transactions")
-        .select("points")
-        .gt("points", 0);
+      // Call REST endpoint that aggregates loyalty stats
+      const data = await fetchAPI("/api/loyalty/stats");
 
-      const totalPointsDistributed = earnedPoints?.reduce((sum, tx) => sum + tx.points, 0) || 0;
-
-      // Get rewards redeemed count
-      const { count: rewardsRedeemed } = await supabase
-        .from("loyalty_transactions")
-        .select("*", { count: "exact", head: true })
-        .eq("type", "redemption");
-
-      // Get active members count
-      const { count: activeMembers } = await supabase
-        .from("loyalty_accounts")
-        .select("*", { count: "exact", head: true });
+      // Expected response shape:
+      // {
+      //   totalPointsDistributed: number,
+      //   rewardsRedeemed: number,
+      //   activeMembers: number
+      // }
 
       return {
-        totalPointsDistributed,
-        rewardsRedeemed: rewardsRedeemed || 0,
-        activeMembers: activeMembers || 0,
+        totalPointsDistributed: data.totalPointsDistributed || 0,
+        rewardsRedeemed: data.rewardsRedeemed || 0,
+        activeMembers: data.activeMembers || 0,
       };
     },
   });

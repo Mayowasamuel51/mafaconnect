@@ -1,149 +1,93 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+// ✅ Base API helper
+async function fetchAPI(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    ...options,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP error ${res.status}`);
+  }
+  return res.json();
+}
 
 export function useProductLocations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // 🔹 Get all product-location mappings
   const { data: productLocations, isLoading } = useQuery({
     queryKey: ["product-locations"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("product_locations")
-        .select(`
-          *,
-          product:products(*),
-          location:locations(*)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
+      const data = await fetchAPI("/api/product-locations");
+      return data; // Expect: [{ id, product_id, location_id, stock_qty, reorder_level, ... }]
     },
   });
 
+  // 🔹 Optional: Detailed stock with product/location info
   const getProductLocationStock = useQuery({
     queryKey: ["product-location-stock"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("product_locations")
-        .select(`
-          *,
-          product:products(id, name, sku),
-          location:locations(id, name, state)
-        `);
-
-      if (error) throw error;
-      return data;
+      const data = await fetchAPI("/api/product-locations/stock");
+      return data; // Expect: [{ id, product: { name }, location: { name, state }, stock_qty }]
     },
   });
 
+  // 🔹 Update or assign stock to a location
   const updateProductLocationStock = useMutation({
-    mutationFn: async ({ 
-      productId, 
-      locationId, 
-      stockQty, 
-      reorderLevel 
-    }: { 
-      productId; 
-      locationId; 
-      stockQty?; 
-      reorderLevel?;
-    }) => {
-      const updateData = {};
-      if (stockQty !== undefined) updateData.stock_qty = stockQty;
-      if (reorderLevel !== undefined) updateData.reorder_level = reorderLevel;
-
-      const { error } = await supabase
-        .from("product_locations")
-        .upsert({
-          product_id: productId,
-          location_id: locationId,
-          ...updateData,
-        });
-
-      if (error) throw error;
+    mutationFn: async ({ productId, locationId, stockQty, reorderLevel }) => {
+      const payload = {
+        product_id: productId,
+        location_id: locationId,
+        ...(stockQty !== undefined ? { stock_qty: stockQty } : {}),
+        ...(reorderLevel !== undefined ? { reorder_level: reorderLevel } : {}),
+      };
+      await fetchAPI("/api/product-locations/update", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-locations"] });
       queryClient.invalidateQueries({ queryKey: ["product-location-stock"] });
       toast({
-        title: "Stock updated",
+        title: "Stock Updated",
         description: "Location stock has been updated successfully.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        title: "Error updating stock",
+        title: "Error Updating Stock",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
+  // 🔹 Adjust existing stock (add/remove)
   const adjustLocationStock = useMutation({
-    mutationFn: async ({
-      productId,
-      locationId,
-      adjustment,
-      reason,
-    }: {
-      productId;
-      locationId;
-      adjustment;
-      reason;
-    }) => {
-      const { data: currentStock, error: fetchError } = await supabase
-        .from("product_locations")
-        .select("stock_qty")
-        .eq("product_id", productId)
-        .eq("location_id", locationId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const newQty = (currentStock?.stock_qty || 0) + adjustment;
-
-      const { error: updateError } = await supabase
-        .from("product_locations")
-        .update({ stock_qty: newQty })
-        .eq("product_id", productId)
-        .eq("location_id", locationId);
-
-      if (updateError) throw updateError;
-
-      // Log stock movement
-      const { data: { user } } = await supabase.auth.getUser();
-      const movementNumber = `ADJ-${Date.now()}`;
-
-      const { error: movementError } = await supabase
-        .from("stock_movements")
-        .insert({
-          product_id: productId,
-          from_location_id: adjustment < 0 ? locationId ,
-          to_location_id: adjustment > 0 ? locationId ,
-          quantity: Math.abs(adjustment),
-          movement_type: adjustment > 0 ? 'adjustment_in' : 'adjustment_out',
-          movement_number: movementNumber,
-          notes: reason,
-          processed_by: user?.id,
-          status: 'completed',
-        });
-
-      if (movementError) throw movementError;
+    mutationFn: async ({ productId, locationId, adjustment, reason }) => {
+      const payload = { productId, locationId, adjustment, reason };
+      await fetchAPI("/api/product-locations/adjust", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["product-locations"] });
       queryClient.invalidateQueries({ queryKey: ["stock-movements"] });
       toast({
-        title: "Stock adjusted",
+        title: "Stock Adjusted",
         description: "Stock quantity has been adjusted successfully.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        title: "Error adjusting stock",
+        title: "Error Adjusting Stock",
         description: error.message,
         variant: "destructive",
       });

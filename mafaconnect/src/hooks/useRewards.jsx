@@ -1,17 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 export function useRewards() {
   const { data: rewards, isLoading } = useQuery({
     queryKey: ["rewards"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rewards")
-        .select("*")
-        .eq("active", true)
-        .order("points_cost");
+      const res = await fetch("/api/rewards", {
+        method: "GET",
+        credentials: "include",
+      });
 
-      if (error) throw error;
+      if (!res.ok) throw new Error(`Failed to fetch rewards (HTTP ${res.status})`);
+
+      const data = await res.json();
       return data;
     },
   });

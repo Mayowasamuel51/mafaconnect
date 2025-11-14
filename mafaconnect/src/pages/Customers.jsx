@@ -1,9 +1,9 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/uimain/card";
-import { Button } from "@/components/uimain/button";
-import { Input } from "@/components/uimain/Input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { UserPlus, Search, User, Award, Loader2 } from "lucide-react";
-import { Badge } from "@/components/uimain/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CustomerDialog } from "@/components/CustomerDialog";
 

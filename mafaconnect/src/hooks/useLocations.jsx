@@ -1,76 +1,97 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const API_URL = import.meta.env.VITE_HOME_OO || "http://localhost:8000/api";
 
 export function useLocations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // 🔹 Fetch all locations
   const { data: locations, isLoading } = useQuery({
     queryKey: ["locations"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("locations")
-        .select("*")
-        .order("name");
-
-      if (error) throw error;
-      return data;
+      const res = await fetch(`${API_URL}/locations`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch locations");
+      const data = await res.json();
+      return data.locations || data; // handle flexible response format
     },
   });
 
+  // 🔹 Create a new location
   const createLocation = useMutation({
-    mutationFn: async (locationData: {
-      name;
-      address?;
-      phone?;
-      email?;
-      state?;
-      zone?;
-      location_type?;
-      capacity_sqft?;
-      manager_id?: string | null;
-      active?;
-    }) => {
-      const { error } = await supabase
-        .from("locations")
-        .insert(locationData);
+    mutationFn: async (locationData) => {
+      const res = await fetch(`${API_URL}/locations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(locationData),
+      });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to create location");
+      }
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["locations"] });
+      queryClient.invalidateQueries(["locations"]);
       toast({
-        title: "Success",
+        title: "✅ Success",
         description: "Location created successfully",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        title: "Error",
+        title: "❌ Error",
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
+  // 🔹 Update an existing location
   const updateLocation = useMutation({
     mutationFn: async ({ id, ...data }) => {
-      const { error } = await supabase
-        .from("locations")
-        .update(data)
-        .eq("id", id);
+      const res = await fetch(`${API_URL}/locations/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to update location");
+      }
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["locations"] });
+      queryClient.invalidateQueries(["locations"]);
       toast({
-        title: "Success",
+        title: "✅ Success",
         description: "Location updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "❌ Error updating location",
+        description: error.message,
+        variant: "destructive",
       });
     },
   });
 
-  return { locations, isLoading, createLocation: createLocation.mutate, updateLocation: updateLocation.mutate };
+  return {
+    locations,
+    isLoading,
+    createLocation: createLocation.mutate,
+    updateLocation: updateLocation.mutate,
+  };
 }
