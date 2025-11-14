@@ -30,7 +30,7 @@ app.use("/api/v1", adminRoutes);
 app.use("/api/v1", customer_bussiness);
 
 app.get("/", (req, res) => res.send(" MafaConnect Backend is running..."));
-
+app.get("/health", (req, res) => res.send(" MafaConnect Backend is running..."));
 const PORT = process.env.PORT || 8000;
 
 (async () => {
