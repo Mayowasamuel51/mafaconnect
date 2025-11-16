@@ -36,7 +36,7 @@ export function UserManagement() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [userToDelete, setUserToDelete] = React.useState(null);
-
+  console.log(users)
   console.log('UserManagement render:', { 
     usersCount: users?.length, 
     loading: isLoading,

@@ -3,8 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Pusher from "pusher-js";
 import { useAuth } from "./useAuth";
-import { MessageNotificationToast } from "@/components/chat/MessageNotificationToast.jsx";
-
+import { MessageNotificationToast } from "@/components/chat/MessageNotificationToast";
 export function useMessageNotifications(currentConversationId = null) {
   const { user } = useAuth();
   const queryClient = useQueryClient();

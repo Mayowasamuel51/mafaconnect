@@ -5,15 +5,25 @@ const {
   getCurrentUser,
   refreshToken,
   logout,
-  getDashboard,
+  getDashboard, showAllUser,
 } = require("../controllers/adminController");
 const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
-router.post("/login", adminLogin);
+// working api for admin side
+router.get('/allusers',authenticate, requireRole( "admin"), showAllUser)
 router.get("/auth/me", authenticate, requireRole("user", "sales_person", "manager", "admin"), getCurrentUser);
+
+
+
+router.post("/login", adminLogin);
+
 // router.get("/auth/me", authenticate, requireRole("user"), getCurrentUser);
+
 router.post("/refresh", refreshToken);
+
+
 router.post("/logout", logout);
+
 // Only admins can access dashboard
 router.get("/dashboard", authenticate, requireRole("admin"), getDashboard);
 // router.get("/dashboard", getDashboard);

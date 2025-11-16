@@ -4,7 +4,7 @@ const { User } = require("../models/user");
 require("dotenv").config();
 
 /**
- * 🔐 Helper to generate access token
+ * Helper to generate access token
  */
 const generateAccessToken = (user) => {
   if (!process.env.JWT_ACCESS_SECRET) throw new Error("Missing JWT_ACCESS_SECRET");
@@ -27,9 +27,32 @@ const generateRefreshToken = (user) => {
   );
 };
 
-/**
- * ✅ Admin Login
- */
+exports.showAllUser = async (req, res) => {
+  try {
+    const users = await User.findAll();
+    console.log(users)
+    return res.status(200).json({
+      success: true,
+      message: "All users fetched successfully",
+      data: users
+    });
+
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch users",
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
+
+
 exports.adminLogin = async (req, res) => {
   try {
     const { account_number, password } = req.body;
@@ -71,9 +94,7 @@ exports.adminLogin = async (req, res) => {
   }
 };
 
-/**
- * ✅ Get Current User
- */
+
 exports.getCurrentUser = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -98,9 +119,7 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-/**
- * ✅ Refresh Access Token using cookie
- */
+
 exports.refreshToken = (req, res) => {
   try {
     const token = req.cookies.refresh_token;
@@ -121,9 +140,7 @@ exports.refreshToken = (req, res) => {
   }
 };
 
-/**
- * ✅ Logout
- */
+
 exports.logout = async (req, res) => {
   res.clearCookie("refresh_token", {
     httpOnly: true,
@@ -191,6 +208,63 @@ exports.approveUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // const bcrypt = require("bcrypt");
 // const jwt = require("jsonwebtoken");
