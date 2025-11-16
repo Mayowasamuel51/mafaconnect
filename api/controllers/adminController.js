@@ -87,7 +87,7 @@ exports.assignRole = async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
 
-    const validRoles = ["admin", "manager", "sales_person", "customer"];
+    const validRoles = ["admin", "manager", "sales_agent", "customer"];
 
     if (!validRoles.includes(role)) {
       return res.status(400).json({
