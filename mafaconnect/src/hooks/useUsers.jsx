@@ -37,7 +37,7 @@ export function useUsers() {
   // =====================================================
   const updateUserApproval = useMutation({
     mutationFn: async ({ userId, status, notes }) => {
-      const res = await fetch(`${API_BASE}/api/users/${userId}/approval`, {
+      const res = await fetch(`${API_BASE}/users/${userId}/approval`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

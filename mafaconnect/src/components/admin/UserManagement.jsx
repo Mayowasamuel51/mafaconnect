@@ -175,22 +175,113 @@ export function UserManagement() {
                       </div>
                     </TableCell>
                     <TableCell>{getApprovalBadge(user.approval_status)}</TableCell>
+                 
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.user_roles?.length > 0 ? (
-                          user.user_roles.map((ur) => (
-                            <Badge key={ur.role} variant="outline" className="text-xs">
-                              {ur.role}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-muted-foreground text-sm">No roles</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
+  <div className="flex flex-wrap gap-1">
+    {user.role ? (
+      <Badge variant="outline" className="text-xs">
+        {user.role}
+      </Badge>
+    ) : (
+      <span className="text-muted-foreground text-sm">No role</span>
+    )}
+  </div>
+</TableCell>
+<TableCell>
+  <div className="flex flex-col gap-2">
+    
+    {/* KYC STATUS BADGE */}
+    <div>
+      {user.kyc_status === "pending" && (
+        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
+          Pending
+        </span>
+      )}
+
+      {user.kyc_status === "approved" && (
+        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+          Approved
+        </span>
+      )}
+
+      {user.kyc_status === "rejected" && (
+        <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
+          Rejected
+        </span>
+      )}
+    </div>
+
+    {/* ACTION BUTTONS */}
+    <div className="flex flex-wrap gap-2">
+      {/* Approve / Reject Buttons */}
+      {user.kyc_status === "pending" && (
+        <>
+          <Button
+            size="sm"
+            variant="default"
+            onClick={() => updateUserApproval({ userId: user.id, status: "approved" })}
+          >
+            <Check className="h-4 w-4" />
+          </Button>
+
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => updateUserApproval({ userId: user.id, status: "rejected" })}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </>
+      )}
+
+      {/* Role Management */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="sm" variant="outline">
+            <UserCog className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "sales_agent" })}>
+            <Shield className="h-4 w-4 mr-2" /> Make Sales Agent
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "manager" })}>
+            <Shield className="h-4 w-4 mr-2" /> Make Manager
+          </DropdownMenuItem>
+
+          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "admin" })}>
+            <Shield className="h-4 w-4 mr-2" /> Make Admin
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+
+          {/* Remove Current Role */}
+          <DropdownMenuItem
+            onClick={() => removeRole({ userId: user.id, role: user.role })}
+            className="text-orange-600"
+          >
+            <X className="h-4 w-4 mr-2" /> Remove {user.role}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Delete Button */}
+      <Button
+        size="sm"
+        variant="destructive"
+        onClick={() => setUserToDelete(user.id)}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  </div>
+</TableCell>
+
+                    {/* <TableCell>
                       <div className="flex flex-wrap gap-2">
-                        {user.approval_status === "pending" && (
+                        {user.kyc_status === "pending" && (
                           <>
                             <Button
                               size="sm"
@@ -248,7 +339,7 @@ export function UserManagement() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))
               )}
