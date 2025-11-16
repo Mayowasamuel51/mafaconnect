@@ -13,8 +13,8 @@ const User = sequelize.define("User", {
   phone: { type: DataTypes.STRING, allowNull: true },
   password: { type: DataTypes.STRING, allowNull: false },
   role: {
-    type: DataTypes.ENUM("admin", "manager", "sales_person", "user"),
-    defaultValue: "user",
+    type: DataTypes.ENUM("admin", "manager", "sales_person", "customer"),
+    defaultValue: "customer",
   },
   kyc_status: {
     type: DataTypes.ENUM("pending", "approved", "rejected"),

@@ -63,7 +63,7 @@ export default function Auth() {
         if (role === "admin") navigate("/admin");
         else if (role === "manager") navigate("/manager");
         else if (role === "sales_agent") navigate("/sales");
-        else if (role === "user") navigate('/customer-dashboard')
+        else if (role === "customer") navigate('/customer-dashboard')
         // else navigate("/customer-dashboard");
       } else {
         throw new Error("Invalid response from server");

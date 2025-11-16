@@ -11,7 +11,7 @@ const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
 // working api for admin side
 router.get('/allusers',authenticate, requireRole( "admin"), showAllUser)
-router.get("/auth/me", authenticate, requireRole("user", "sales_person", "manager", "admin"), getCurrentUser);
+router.get("/auth/me", authenticate, requireRole("customer", "sales_person", "manager", "admin"), getCurrentUser);
 
 
 
