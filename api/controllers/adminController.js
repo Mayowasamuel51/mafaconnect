@@ -30,7 +30,7 @@ const generateRefreshToken = (user) => {
 exports.showAllUser = async (req, res) => {
   try {
     const users = await User.findAll();
-    console.log(users)
+    // console.log(users)
     return res.status(200).json({
       success: true,
       message: "All users fetched successfully",
@@ -48,6 +48,86 @@ exports.showAllUser = async (req, res) => {
 };
 
 
+
+// ✅ Admin approves user
+exports.approveUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.kyc_status === "approved") {
+      return res.status(400).json({ message: "User already approved" });
+    }
+
+    user.kyc_status = "approved";
+    user.account_number = generateAccountNumber();
+    await user.save();
+
+    res.json({
+      message: "✅ User approved successfully",
+      account_number: user.account_number,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        kyc_status: user.kyc_status,
+      },
+    });
+  } catch (err) {
+    console.error("Approve error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.assignRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    const validRoles = ["admin", "manager", "sales_person", "customer"];
+
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role",
+      });
+    }
+
+    // Find user
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Update role
+    user.role = role;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Role updated successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+  } catch (err) {
+    console.error("Assign role error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error assigning role",
+    });
+  }
+};
 
 
 
@@ -176,38 +256,6 @@ function generateAccountNumber() {
   return random.toString(); // e.g. "82643109"
 }
 
-// ✅ Admin approves user
-exports.approveUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const user = await User.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (user.kyc_status === "approved") {
-      return res.status(400).json({ message: "User already approved" });
-    }
-
-    user.kyc_status = "approved";
-    user.account_number = generateAccountNumber();
-    await user.save();
-
-    res.json({
-      message: "✅ User approved successfully",
-      account_number: user.account_number,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        kyc_status: user.kyc_status,
-      },
-    });
-  } catch (err) {
-    console.error("Approve error:", err.message);
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
 
 

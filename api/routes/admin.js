@@ -6,12 +6,16 @@ const {
   refreshToken,
   logout,
   getDashboard, showAllUser,
+  assignRole,
+  approveUser,
 } = require("../controllers/adminController");
 const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 
 // working api for admin side
 router.get('/allusers',authenticate, requireRole( "admin"), showAllUser)
 router.get("/auth/me", authenticate, requireRole("customer", "sales_person", "manager", "admin"), getCurrentUser);
+router.get('/users/{userId}/approval',authenticate, requireRole( "admin"), approveUser)
+router.post('/users/:userId/roles',authenticate, requireRole( "admin"),assignRole)
 
 
 

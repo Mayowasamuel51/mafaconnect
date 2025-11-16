@@ -62,7 +62,7 @@ export function useUsers() {
   // =====================================================
   const assignRole = useMutation({
     mutationFn: async ({ userId, role }) => {
-      const res = await fetch(`${API_BASE}/api/users/${userId}/roles`, {
+      const res = await fetch(`${API_BASE}/users/${userId}/roles`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
