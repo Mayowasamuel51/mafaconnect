@@ -59,7 +59,7 @@ export default function Auth() {
         });
 
         // Redirect based on role
-        const role = res.data.admin?.role || "user";
+        const role = res.data.admin?.role || "customer";
         if (role === "admin") navigate("/admin");
         else if (role === "manager") navigate("/manager");
         else if (role === "sales_agent") navigate("/sales");
