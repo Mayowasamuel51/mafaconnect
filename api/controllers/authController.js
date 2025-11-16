@@ -16,7 +16,7 @@ const generateAccessToken = (user) => {
       email: user.email,
     },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "9d" }
   );
 };
 
@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
         .json({ message: "Email, account number, or identifier is required." });
     }
 
-    console.log("🧩 Login attempt for:", identifier);
+    console.log(" Login attempt for:", identifier);
 
     // Find user by account_number OR email
     const user = await User.findOne({

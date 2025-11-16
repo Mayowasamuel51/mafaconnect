@@ -216,9 +216,8 @@ export function UserManagement() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        {getApprovalBadge(user.approval_status)}
-                      </TableCell>
+
+                      <TableCell>{getApprovalBadge(user.kyc_status)}</TableCell>
 
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
@@ -233,72 +232,107 @@ export function UserManagement() {
                           )}
                         </div>
                       </TableCell>
-<TableCell>
-  <div className="flex flex-wrap gap-2">
-    {/* KYC approval buttons */}
-    {user.kyc_status === "pending" && (
-      <>
-        <Button
-          size="sm"
-          variant="default"
-          onClick={() => updateUserApproval({ userId: user.id, status: "approved" })}
-        >
-          <Check className="h-4 w-4" />
-        </Button>
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => updateUserApproval({ userId: user.id, status: "rejected" })}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </>
-    )}
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          {/* KYC approval buttons */}
+                          {user.kyc_status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() =>
+                                  updateUserApproval({
+                                    userId: user.id,
+                                    status: "approved",
+                                  })
+                                }
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() =>
+                                  updateUserApproval({
+                                    userId: user.id,
+                                    status: "rejected",
+                                  })
+                                }
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
 
-    {/* Role dropdown */}
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="outline">
-          <UserCog className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+                          {/* Role dropdown */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                <UserCog className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
-        {/* Assign Roles */}
-        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "sales_agent" })}>
-          <Shield className="h-4 w-4 mr-2" /> Make Sales Agent
-        </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                              {/* Assign Roles */}
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  assignRole({
+                                    userId: user.id,
+                                    role: "sales_agent",
+                                  })
+                                }
+                              >
+                                <Shield className="h-4 w-4 mr-2" /> Make Sales
+                                Agent
+                              </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "manager" })}>
-          <Shield className="h-4 w-4 mr-2" /> Make Manager
-        </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  assignRole({
+                                    userId: user.id,
+                                    role: "manager",
+                                  })
+                                }
+                              >
+                                <Shield className="h-4 w-4 mr-2" /> Make Manager
+                              </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "admin" })}>
-          <Shield className="h-4 w-4 mr-2" /> Make Admin
-        </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  assignRole({ userId: user.id, role: "admin" })
+                                }
+                              >
+                                <Shield className="h-4 w-4 mr-2" /> Make Admin
+                              </DropdownMenuItem>
 
-        {/* Remove Current Role */}
-        <DropdownMenuSeparator />
+                              {/* Remove Current Role */}
+                              <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => removeRole({ userId: user.id, role: user.role })}
-          className="text-orange-600"
-        >
-          <X className="h-4 w-4 mr-2" /> Remove {user.role}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  removeRole({
+                                    userId: user.id,
+                                    role: user.role,
+                                  })
+                                }
+                                className="text-orange-600"
+                              >
+                                <X className="h-4 w-4 mr-2" /> Remove{" "}
+                                {user.role}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
 
-    {/* Delete User */}
-    <Button
-      size="sm"
-      variant="destructive"
-      onClick={() => setUserToDelete(user.id)}
-    >
-      <Trash2 className="h-4 w-4" />
-    </Button>
-  </div>
-</TableCell>
+                          {/* Delete User */}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setUserToDelete(user.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
 
                       {/* <TableCell>
                       <div className="flex flex-wrap gap-2">
