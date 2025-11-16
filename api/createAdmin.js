@@ -9,7 +9,7 @@ require("dotenv").config();
     console.log("✅ Database connected...");
     await sequelize.sync({ alter: true });
     // Default admin credentials
-    const account_number = "00000031";
+    const account_number = "00000032";
     const password = "22413";
     const hashedPassword = await bcrypt.hash(password, 12);
 
