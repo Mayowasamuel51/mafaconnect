@@ -1,11 +1,33 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useUsers } from "@/hooks/useUsers";
-import { Check, X, Shield, UserCog, Trash2, Search, Phone, Building2 } from "lucide-react";
+import {
+  Check,
+  X,
+  Shield,
+  UserCog,
+  Trash2,
+  Search,
+  Phone,
+  Building2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,15 +54,22 @@ import {
 } from "@/components/ui/select";
 
 export function UserManagement() {
-  const { users, isLoading, updateUserApproval, assignRole, removeRole, deleteUser } = useUsers();
+  const {
+    users,
+    isLoading,
+    updateUserApproval,
+    assignRole,
+    removeRole,
+    deleteUser,
+  } = useUsers();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [userToDelete, setUserToDelete] = React.useState(null);
-  console.log(users)
-  console.log('UserManagement render:', { 
-    usersCount: users?.length, 
+  console.log(users);
+  console.log("UserManagement render:", {
+    usersCount: users?.length,
     loading: isLoading,
-    users: users 
+    users: users,
   });
 
   if (isLoading) {
@@ -54,17 +83,23 @@ export function UserManagement() {
   }
 
   if (!users || users.length === 0) {
-    console.log('No users found or access denied');
+    console.log("No users found or access denied");
     return (
       <Card>
         <CardHeader>
           <CardTitle>User Management</CardTitle>
-          <CardDescription>Manage user accounts, roles, and approvals</CardDescription>
+          <CardDescription>
+            Manage user accounts, roles, and approvals
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-muted-foreground">No users found or you don't have permission to view users.</p>
-            <p className="text-sm text-muted-foreground mt-2">Make sure you're logged in admin.</p>
+            <p className="text-muted-foreground">
+              No users found or you don't have permission to view users.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Make sure you're logged in admin.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -81,14 +116,15 @@ export function UserManagement() {
   };
 
   const filteredUsers = users?.filter((user) => {
-    const matchesSearch = 
+    const matchesSearch =
       user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.phone?.includes(searchQuery) ||
       user.business_name?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || user.approval_status === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === "all" || user.approval_status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -102,7 +138,9 @@ export function UserManagement() {
       <Card>
         <CardHeader>
           <CardTitle>User Management</CardTitle>
-          <CardDescription>Manage user accounts, roles, and approvals</CardDescription>
+          <CardDescription>
+            Manage user accounts, roles, and approvals
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -130,156 +168,139 @@ export function UserManagement() {
 
           <div className="rounded-md border">
             <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User Details</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Roles</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers?.length === 0 ? (
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                    No users found
-                  </TableCell>
+                  <TableHead>User Details</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Roles</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ) : (
-                filteredUsers?.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-medium">{user.full_name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          Joined {new Date(user.created_at).toLocaleDateString()}
-                        </span>
-                        {user.business_name && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Building2 className="h-3 w-3" />
-                            {user.business_name}
-                          </div>
-                        )}
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers?.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground py-8"
+                    >
+                      No users found
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1 text-sm">
-                        <span>{user.email || "No email"}</span>
-                        {user.phone && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Phone className="h-3 w-3" />
-                            {user.phone}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getApprovalBadge(user.approval_status)}</TableCell>
-                 
-                    <TableCell>
-  <div className="flex flex-wrap gap-1">
-    {user.role ? (
-      <Badge variant="outline" className="text-xs">
-        {user.role}
-      </Badge>
-    ) : (
-      <span className="text-muted-foreground text-sm">No role</span>
-    )}
-  </div>
-</TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsers?.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-medium">{user.full_name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            Joined{" "}
+                            {new Date(user.created_at).toLocaleDateString()}
+                          </span>
+                          {user.business_name && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Building2 className="h-3 w-3" />
+                              {user.business_name}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1 text-sm">
+                          <span>{user.email || "No email"}</span>
+                          {user.phone && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Phone className="h-3 w-3" />
+                              {user.phone}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getApprovalBadge(user.approval_status)}
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {user.role ? (
+                            <Badge variant="outline" className="text-xs">
+                              {user.role}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">
+                              No role
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
 <TableCell>
-  <div className="flex flex-col gap-2">
-    
-    {/* KYC STATUS BADGE */}
-    <div>
-      {user.kyc_status === "pending" && (
-        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">
-          Pending
-        </span>
-      )}
+  <div className="flex flex-wrap gap-2">
+    {/* KYC approval buttons */}
+    {user.kyc_status === "pending" && (
+      <>
+        <Button
+          size="sm"
+          variant="default"
+          onClick={() => updateUserApproval({ userId: user.id, status: "approved" })}
+        >
+          <Check className="h-4 w-4" />
+        </Button>
+        <Button
+          size="sm"
+          variant="destructive"
+          onClick={() => updateUserApproval({ userId: user.id, status: "rejected" })}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </>
+    )}
 
-      {user.kyc_status === "approved" && (
-        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-          Approved
-        </span>
-      )}
+    {/* Role dropdown */}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="outline">
+          <UserCog className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
 
-      {user.kyc_status === "rejected" && (
-        <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
-          Rejected
-        </span>
-      )}
-    </div>
+      <DropdownMenuContent align="end">
+        {/* Assign Roles */}
+        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "sales_agent" })}>
+          <Shield className="h-4 w-4 mr-2" /> Make Sales Agent
+        </DropdownMenuItem>
 
-    {/* ACTION BUTTONS */}
-    <div className="flex flex-wrap gap-2">
-      {/* Approve / Reject Buttons */}
-      {user.kyc_status === "pending" && (
-        <>
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => updateUserApproval({ userId: user.id, status: "approved" })}
-          >
-            <Check className="h-4 w-4" />
-          </Button>
+        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "manager" })}>
+          <Shield className="h-4 w-4 mr-2" /> Make Manager
+        </DropdownMenuItem>
 
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => updateUserApproval({ userId: user.id, status: "rejected" })}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </>
-      )}
+        <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "admin" })}>
+          <Shield className="h-4 w-4 mr-2" /> Make Admin
+        </DropdownMenuItem>
 
-      {/* Role Management */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="sm" variant="outline">
-            <UserCog className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
+        {/* Remove Current Role */}
+        <DropdownMenuSeparator />
 
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "sales_agent" })}>
-            <Shield className="h-4 w-4 mr-2" /> Make Sales Agent
-          </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => removeRole({ userId: user.id, role: user.role })}
+          className="text-orange-600"
+        >
+          <X className="h-4 w-4 mr-2" /> Remove {user.role}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
 
-          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "manager" })}>
-            <Shield className="h-4 w-4 mr-2" /> Make Manager
-          </DropdownMenuItem>
-
-          <DropdownMenuItem onClick={() => assignRole({ userId: user.id, role: "admin" })}>
-            <Shield className="h-4 w-4 mr-2" /> Make Admin
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-
-          {/* Remove Current Role */}
-          <DropdownMenuItem
-            onClick={() => removeRole({ userId: user.id, role: user.role })}
-            className="text-orange-600"
-          >
-            <X className="h-4 w-4 mr-2" /> Remove {user.role}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {/* Delete Button */}
-      <Button
-        size="sm"
-        variant="destructive"
-        onClick={() => setUserToDelete(user.id)}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
+    {/* Delete User */}
+    <Button
+      size="sm"
+      variant="destructive"
+      onClick={() => setUserToDelete(user.id)}
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
   </div>
 </TableCell>
 
-                    {/* <TableCell>
+                      {/* <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {user.kyc_status === "pending" && (
                           <>
@@ -340,21 +361,26 @@ export function UserManagement() {
                         </Button>
                       </div>
                     </TableCell> */}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
 
-      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+      <AlertDialog
+        open={!!userToDelete}
+        onOpenChange={() => setUserToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this user? This action will remove their profile and all associated roles. This action cannot be undone.
+              Are you sure you want to delete this user? This action will remove
+              their profile and all associated roles. This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
