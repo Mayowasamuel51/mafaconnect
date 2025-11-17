@@ -9,6 +9,7 @@ const {
   assignRole,
   approveUser,
   createProduct,
+  getAllProducts,
 } = require("../controllers/adminController");
 const { authenticate, requireRole } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerUpload");
@@ -18,12 +19,26 @@ router.get('/allusers',authenticate, requireRole( "admin"), showAllUser)
 router.get("/auth/me", authenticate, requireRole("customer", "sales_person", "manager", "admin"), getCurrentUser);
 router.get('/users/{userId}/approval',authenticate, requireRole( "admin"), approveUser)
 router.post('/users/:userId/roles',authenticate, requireRole( "admin"),assignRole)
+// router.post(
+//   "/products",
+//   authenticate,
+//   requireRole("admin", "manager"),   
+//   upload.array("images"),        
+//   createProduct
+// );
+
 router.post(
   "/products",
   authenticate,
-  requireRole("admin", "manager"),   // 🟢 Only these roles can upload products
-  upload.array("images", 10),        // 🟢 Accept up to 10 images
+  requireRole("admin", "manager"),
+  upload.array("images"),
   createProduct
+);
+
+// Anyone logged-in can view products
+router.get(
+  "/products",
+  getAllProducts
 );
 
 router.post("/login", adminLogin);

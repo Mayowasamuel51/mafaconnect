@@ -2,7 +2,8 @@
 import axios from "axios";
 
 // 🧠 Base URL of your Node.js backend
-const API_BASE_URL = "https://mafaconnectbackendapi.onrender.com/api/v1"
+const API_BASE_URL = import.meta.env.VITE_HOME_OO
+// "https://mafaconnectbackendapi.onrender.com/api/v1"
 // import.meta.env.VITE_HOME_OO
 
 // Axios instance

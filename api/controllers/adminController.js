@@ -130,7 +130,7 @@ exports.createProduct = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // 1️⃣ Create product in DB
+  
     const product = await Product.create({
       name: req.body.name,
       sku: req.body.sku,
@@ -182,11 +182,38 @@ exports.createProduct = async (req, res) => {
 };
 
 
+exports.getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.findAll({
+      include: [
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "image_url", "cloudinary_public_id"],
+        },
+        {
+          model: User,
+          as: "creator",
+          attributes: ["id", "name", "email", "role"], 
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
 
-
-
-
-
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully",
+      data: products,
+    });
+    
+  } catch (err) {
+    console.error("❌ Fetch products error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error fetching products",
+    });
+  }
+};
 
 
 
