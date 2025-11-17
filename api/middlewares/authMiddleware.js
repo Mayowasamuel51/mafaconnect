@@ -34,16 +34,38 @@ exports.authenticate = async (req, res, next) => {
  * ✅ Role-based authorization middleware
  * Example: requireRole("admin")
  */
+
+// middleware/requireRole.js
 exports.requireRole = (...allowedRoles) => {
   return (req, res, next) => {
+    // User must be authenticated first
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    // Check if user role is inside allowed roles
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Forbidden: insufficient role" });
+      return res.status(403).json({
+        message: "Forbidden: insufficient role permission",
+        allowed_roles: allowedRoles,
+        your_role: req.user.role,
+      });
     }
 
     next();
   };
 };
+
+// exports.requireRole = (...allowedRoles) => {
+//   return (req, res, next) => {
+//     if (!req.user) {
+//       return res.status(401).json({ message: "Unauthorized" });
+//     }
+
+//     if (!allowedRoles.includes(req.user.role)) {
+//       return res.status(403).json({ message: "Forbidden: insufficient role" });
+//     }
+
+//     next();
+//   };
+// };

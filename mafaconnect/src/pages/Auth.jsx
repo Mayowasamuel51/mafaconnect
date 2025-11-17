@@ -44,7 +44,8 @@ export default function Auth() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetError, setResetError] = useState("");
 
-  const API_URL = "https://mafaconnectbackendapi.onrender.com/api/v1";
+  const API_URL = import.meta.env.VITE_HOME_OO
+  // "https://mafaconnectbackendapi.onrender.com/api/v1";
 
   // ------------------------------------------------------------
   // LOGIN

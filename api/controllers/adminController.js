@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 require("dotenv").config();
-
+const cloudinary = require("../cloudinary");
+const { Product, ProductImage } = require("../models");
 /**
  * Helper to generate access token
  */
@@ -15,9 +16,6 @@ const generateAccessToken = (user) => {
   );
 };
 
-/**
- * 🔐 Helper to generate refresh token
- */
 const generateRefreshToken = (user) => {
   if (!process.env.JWT_REFRESH_SECRET) throw new Error("Missing JWT_REFRESH_SECRET");
   return jwt.sign(
@@ -46,8 +44,6 @@ exports.showAllUser = async (req, res) => {
     });
   }
 };
-
-
 
 // ✅ Admin approves user
 exports.approveUser = async (req, res) => {
@@ -130,6 +126,98 @@ exports.assignRole = async (req, res) => {
 };
 
 
+exports.createProduct = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // 1️⃣ Create product in DB
+    const product = await Product.create({
+      name: req.body.name,
+      sku: req.body.sku,
+      description: req.body.description || null,
+      cost_price: parseFloat(req.body.cost_price),
+      sale_price: parseFloat(req.body.sale_price),
+      stock_qty: parseInt(req.body.stock_qty),
+      reorder_level: parseInt(req.body.reorder_level),
+      active: true,
+      created_by: userId,
+    });
+
+    // 2️⃣ Upload images to Cloudinary
+    let uploadedImages = [];
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadResult = await cloudinary.uploader.upload(file.path, {
+          folder: "mafaconnect/products",
+        });
+
+        uploadedImages.push({
+          product_id: product.id,
+          image_url: uploadResult.secure_url,
+          cloudinary_public_id: uploadResult.public_id,
+        });
+      }
+
+      await ProductImage.bulkCreate(uploadedImages);
+    }
+
+    const productWithImages = await Product.findByPk(product.id, {
+      include: [{ model: ProductImage, as: "images" }],
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: productWithImages,
+    });
+
+  } catch (err) {
+    console.error("Create product error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -173,8 +261,6 @@ exports.adminLogin = async (req, res) => {
     res.status(500).json({ message: "Server error during login" });
   }
 };
-
-
 exports.getCurrentUser = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -197,9 +283,7 @@ exports.getCurrentUser = async (req, res) => {
     }
     res.status(401).json({ message: "Invalid or expired token" });
   }
-};
-
-
+}
 exports.refreshToken = (req, res) => {
   try {
     const token = req.cookies.refresh_token;
@@ -218,9 +302,7 @@ exports.refreshToken = (req, res) => {
     console.error("Refresh error:", err.message);
     res.status(403).json({ message: "Invalid or expired refresh token" });
   }
-};
-
-
+}
 exports.logout = async (req, res) => {
   res.clearCookie("refresh_token", {
     httpOnly: true,

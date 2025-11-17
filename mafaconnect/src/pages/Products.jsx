@@ -29,13 +29,13 @@ export default function Products() {
   }, [products, searchQuery]);
 
   // 🔹 Loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex items-center justify-center h-64">
+  //       <Loader2 className="h-12 w-12 animate-spin text-primary" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-4 sm:space-y-8 p-4 sm:p-6">
