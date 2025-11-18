@@ -57,8 +57,8 @@ exports.login = async (req, res) => {
     // Return login message based on approval
     const message =
       user.kyc_status === "approved"
-        ? "✅ Login successful"
-        : "⚠️ Login successful, but your account is pending admin approval. Some features will be limited.";
+        ? " Login successful"
+        : "Login successful, but your account is pending admin approval. Some features will be limited.";
 
     res.status(200).json({
       message,

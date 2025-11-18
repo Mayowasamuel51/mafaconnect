@@ -102,7 +102,8 @@ export default function Products() {
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div className="p-3 rounded-lg bg-gradient-primary">
-                      <Package className="h-5 w-5 text-primary-foreground" />
+                      {/* <Package className="h-5 w-5 text-primary-foreground" /> */}
+                      <img src={`${product.image}`}/>
                     </div>
 
                     <div className="flex-1">
